@@ -1,0 +1,12 @@
+WINDOWWIDTH = 640
+WINDOWHEIGHT = 480
+FPS = 30
+WEAPONSPEED = 10
+PLAYERSPEED = 10
+WHITE = (255, 255, 255)
+LEFT = 'left'
+RIGHT = 'right'
+UPLEFT = 'upleft'
+UPRIGHT = 'upright'
+DOWNLEFT = 'downleft'
+DOWNRIGHT = 'downright'
