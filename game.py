@@ -13,6 +13,7 @@ class Game:
         pygame.display.set_caption('Bubble Trouble')
         pygame.mouse.set_visible(0)
         self.is_running = False
+        self.is_paused = False
 
     def start(self):
         clock = pygame.time.Clock()
@@ -27,6 +28,12 @@ class Game:
             gui.draw_player(world.player)
             if world.player.weapon.is_active:
                 gui.draw_weapon(world.player.weapon)
+            if world.game_over:
+                is_running = False
+                myfont = pygame.font.SysFont("Comic Sans MS", 50)
+                end_game_label = myfont.render("Game over!", 1, RED)
+                self.screen.blit(end_game_label, (WINDOWWIDTH/2 - 130, WINDOWHEIGHT/2 - 50))
+                self.pause()
             for event in pygame.event.get():
                 if event.type == KEYDOWN:
                     if event.key == K_LEFT:
@@ -46,10 +53,15 @@ class Game:
                 if event.type == QUIT:
                     self.exit()
             pygame.display.update()
+            if self.is_paused:
+                pygame.time.wait(3000)
             clock.tick(FPS)
 
     def exit(self):
         pygame.quit()
         sys.exit()
+
+    def pause(self):
+        self.is_paused = True
 
 

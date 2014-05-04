@@ -8,8 +8,10 @@ class Gameworld:
         self.player = Player()
         self.level = level
         self.load_level(1)
+        self.game_over = False
 
     def load_level(self, level):
+        self.balls = []
         level_path = "levels/level" + str(level) + ".txt"
         level_file = open(level_path, 'r')
         lines = level_file.readlines()
@@ -21,12 +23,19 @@ class Gameworld:
             direction = match.groups()[-1]
             self.balls.append(Ball(x, y, size, direction))
 
-    def check_for_collision(self):
+    def check_for_collisions(self):
         for ball_index in range(len(self.balls)):
             ball = self.balls[ball_index]
             ball_rect = self.balls[ball_index].image.get_rect(left=ball.x, top=ball.y)
             weapon_rect = self.player.weapon.image.get_rect(left=self.player.weapon.x, top=self.player.weapon.y)
-            if ball_rect.colliderect(weapon_rect):
+            player_rect = self.player.image.get_rect(left=self.player.x, top=self.player.y)
+            if ball_rect.colliderect(player_rect):
+                self.player.lives -= 1
+                if self.player.lives:
+                    self.load_level(self.level)
+                else:
+                    self.game_over = True
+            if ball_rect.colliderect(weapon_rect) and self.player.weapon.is_active:
                 self.player.weapon.is_active = False
                 self.split_ball(ball_index)
                 return
@@ -44,8 +53,7 @@ class Gameworld:
     def update(self):
         for ball in self.balls:
             ball.update()
-        if self.player.weapon.is_active:
-            self.check_for_collision()
+        self.check_for_collisions()
         self.player.update()
 
 

@@ -13,6 +13,7 @@ class Player:
         self.image = pygame.image.load('images/player.bmp')
         self.moving_left = False
         self.moving_right = False
+        self.lives = 3
         #self.rect = self.image.get_rect()
 
     def shoot(self):
