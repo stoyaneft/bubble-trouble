@@ -32,29 +32,23 @@ class Game:
                 is_running = False
                 myfont = pygame.font.SysFont("Comic Sans MS", 50)
                 end_game_label = myfont.render("Game over!", 1, RED)
-                self.screen.blit(end_game_label, (WINDOWWIDTH/2 - 130, WINDOWHEIGHT/2 - 50))
+                end_game_rect = end_game_label.get_rect()
+                end_game_rect.centerx, end_game_rect.centery = WINDOWWIDTH/2, WINDOWHEIGHT/2
+                self.screen.blit(end_game_label)
                 self.pause()
-            for event in pygame.event.get():
-                if event.type == KEYDOWN:
-                    if event.key == K_LEFT:
-                        world.player.moving_left = True
-                    elif event.key == K_RIGHT:
-                        world.player.moving_right = True
-                    elif event.key == K_SPACE and not world.player.weapon.is_active:
-                        world.player.shoot()
-                    elif event.key == K_ESCAPE:
-                        self.exit()
-                if event.type == KEYUP:
-                    if event.key == K_LEFT:
-                        world.player.moving_left = False
-                    elif event.type == KEYUP:
-                        world.player.moving_right = False
-
-                if event.type == QUIT:
-                    self.exit()
+            if world.level_completed:
+                myfont = pygame.font.SysFont("Comic Sans MS", 50)
+                level_completed_label = myfont.render("Level completed!", 1, BLUE)
+                level_comp_rect = level_completed_label.get_rect()
+                level_comp_rect.centerx, level_comp_rect.centery = WINDOWWIDTH/2, WINDOWHEIGHT/2
+                self.screen.blit(level_completed_label, level_comp_rect)
+                self.pause()
+                world.load_level(world.level + 1)
+            self.handle_event(world)
             pygame.display.update()
             if self.is_paused:
                 pygame.time.wait(3000)
+                self.is_paused = False
             clock.tick(FPS)
 
     def exit(self):
@@ -63,5 +57,25 @@ class Game:
 
     def pause(self):
         self.is_paused = True
+
+    def handle_event(self, world):
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_LEFT:
+                    world.player.moving_left = True
+                elif event.key == K_RIGHT:
+                    world.player.moving_right = True
+                elif event.key == K_SPACE and not world.player.weapon.is_active:
+                    world.player.shoot()
+                elif event.key == K_ESCAPE:
+                    self.exit()
+            if event.type == KEYUP:
+                if event.key == K_LEFT:
+                    world.player.moving_left = False
+                elif event.type == KEYUP:
+                    world.player.moving_right = False
+            if event.type == QUIT:
+                self.exit()
+
 
 

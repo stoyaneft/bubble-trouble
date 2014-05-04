@@ -28,4 +28,8 @@ class Player:
         if self.weapon.is_active:
             self.weapon.update()
 
+    def reset_position(self):
+        self.x = WINDOWWIDTH / 2
+        self.y = WINDOWHEIGHT - 40
+
 
