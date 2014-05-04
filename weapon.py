@@ -8,6 +8,7 @@ class Weapon:
         self.x = x
         self.y = y
         self.image = pygame.image.load("images/arrow.bmp")
+        #self.rect = self.image.get_rect()
 
     def update(self):
         if self.is_active:
