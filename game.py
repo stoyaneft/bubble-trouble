@@ -1,81 +1,71 @@
-import pygame, sys
-from settings import *
-from pygame.locals import *
+import re
 from ball import *
 from player import *
-from gui import *
-from gameworld import*
 
 class Game:
-    def __init__(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-        pygame.display.set_caption('Bubble Trouble')
-        pygame.mouse.set_visible(0)
-        self.is_running = False
+    def __init__(self, level=1):
+        self.balls = []
+        self.player = Player()
+        self.level = level
+        self.load_level(1)
+        self.game_over = False
+        self.level_completed = False
+        self.is_running = True
         self.is_paused = False
 
-    def start(self):
-        clock = pygame.time.Clock()
-        is_running = True
-        gui = GUI(self.screen)
-        world = Gameworld()
-        while is_running:
-            self.screen.fill((250, 250, 250))
-            world.update()
-            for ball in world.balls:
-                gui.draw_ball(ball)
-            gui.draw_player(world.player)
-            if world.player.weapon.is_active:
-                gui.draw_weapon(world.player.weapon)
-            if world.game_over:
-                is_running = False
-                myfont = pygame.font.SysFont("Comic Sans MS", 50)
-                end_game_label = myfont.render("Game over!", 1, RED)
-                end_game_rect = end_game_label.get_rect()
-                end_game_rect.centerx, end_game_rect.centery = WINDOWWIDTH/2, WINDOWHEIGHT/2
-                self.screen.blit(end_game_label, end_game_rect)
-                self.pause()
-            if world.level_completed:
-                myfont = pygame.font.SysFont("Comic Sans MS", 50)
-                level_completed_label = myfont.render("Level completed!", 1, BLUE)
-                level_comp_rect = level_completed_label.get_rect()
-                level_comp_rect.centerx, level_comp_rect.centery = WINDOWWIDTH/2, WINDOWHEIGHT/2
-                self.screen.blit(level_completed_label, level_comp_rect)
-                self.pause()
-                world.load_level(world.level + 1)
-            self.handle_event(world)
-            pygame.display.update()
-            if self.is_paused:
-                pygame.time.wait(3000)
-                self.is_paused = False
-            clock.tick(FPS)
+    def load_level(self, level):
+        self.balls = []
+        self.player.reset_position()
+        self.level_completed = False
+        self.level = level
+        level_path = "levels/level" + str(level) + ".txt"
+        level_file = open(level_path, 'r')
+        lines = level_file.readlines()
+        lines = list(map(str.rstrip, lines))
+        ball_re = re.compile(r'ball x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
+        for line in lines:
+            match = re.match(ball_re, line)
+            x, y, size = list(map(int, match.groups()[:3]))
+            speed = list(map(int, match.groups()[3:]))
+            self.balls.append(Ball(x, y, size, speed))
 
-    def exit(self):
-        pygame.quit()
-        sys.exit()
+    def _check_for_collisions(self):
+        for ball_index in range(len(self.balls)):
+            ball = self.balls[ball_index]
+            if pygame.sprite.collide_rect(ball, self.player.weapon) and self.player.weapon.is_active:
+                self.player.weapon.is_active = False
+                self.split_ball(ball_index)
+                return
+            if pygame.sprite.collide_rect(ball, self.player):
+                self.player.lives -= 1
+                if self.player.lives:
+                    self.load_level(self.level)
+                    pygame.time.wait(1000)
+                else:
+                    self.game_over = True
+                return
+
+
+    def split_ball(self, ball_index):
+        ball = self.balls[ball_index]
+        if ball.size == 2:
+            del self.balls[ball_index]
+        else:
+            self.balls.append(Ball(ball.rect.left - 25, ball.rect.top - 10, ball.size - 1, [-3, -5]))
+            self.balls.append(Ball(ball.rect.left + 25, ball.rect.top - 10, ball.size - 1, [3, -5]))
+            del self.balls[ball_index]
+
+    def update(self):
+        self._check_for_collisions()
+        for ball in self.balls:
+            ball.update()
+        self.player.update()
+        if not len(self.balls):
+            self.level_completed = True
 
     def pause(self):
         self.is_paused = True
 
-    def handle_event(self, world):
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_LEFT:
-                    world.player.moving_left = True
-                elif event.key == K_RIGHT:
-                    world.player.moving_right = True
-                elif event.key == K_SPACE and not world.player.weapon.is_active:
-                    world.player.shoot()
-                elif event.key == K_ESCAPE:
-                    self.exit()
-            if event.type == KEYUP:
-                if event.key == K_LEFT:
-                    world.player.moving_left = False
-                elif event.key == K_RIGHT:
-                    world.player.moving_right = False
-            if event.type == QUIT:
-                self.exit()
 
 
 
