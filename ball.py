@@ -1,52 +1,45 @@
-import pygame
+import pygame, math
 from settings import *
+from polar_vector import *
 
-UPLEFT = 'upleft'
-UPRIGHT = 'upright'
-DOWNLEFT = 'downleft'
-DOWNRIGHT = 'downright'
-
-class Ball:
-    def __init__(self, x, y, size, direction):
-        self.x = x
-        self.y = y
-        self.direction = direction
+class Ball(pygame.sprite.Sprite):
+    def __init__(self, x, y, size, speed=[3, 0]):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('images/ball' + str(size) + '.bmp')
+        self.rect = self.image.get_rect(centerx=x, centery=y)
         self.size = size
-        self.image = pygame.image.load("images/ball" + str(size) + '.bmp')
-        self.max_height = WINDOWHEIGHT / size
-        #self.rect = self.image.get_rect()
-
+        self.speed = speed
+        self.falling_dist = (WINDOWHEIGHT - self.rect.bottom)
 
     def update(self):
-        if self.direction == DOWNRIGHT:
-            self.x += 1
-            self.y += 5
-            if self.x >= WINDOWWIDTH - self.image.get_width():
-                self.direction = DOWNLEFT
-            if self.y >= WINDOWHEIGHT - self.image.get_height():
-                self.direction = UPRIGHT
+        self.speed[1] += GRAVITY
+        self.rect = self.rect.move(self.speed)
+        if self.rect.left < 0 or self.rect.right > WINDOWWIDTH:
+            self.speed[0] = -self.speed[0]
+        if self.rect.top < 0 or self.rect.bottom > WINDOWHEIGHT:
+            self.speed[1] = -self.speed[1]
+        self.rect.left = self.clip(self.rect.left, 0, WINDOWWIDTH)
+        self.rect.right = self.clip(self.rect.right, 0, WINDOWWIDTH)
+        self.rect.top = self.clip(self.rect.top, 0, WINDOWHEIGHT)
+        self.rect.bottom = self.clip(self.rect.bottom, 0, WINDOWHEIGHT)
 
-        if self.direction == DOWNLEFT:
-            self.x -= 1
-            self.y += 5
-            if self.x <= 0:
-                self.direction = DOWNRIGHT
-            if self.y >= WINDOWHEIGHT - self.image.get_height():
-                self.direction = UPLEFT
+    def clip(self, val, minval, maxval):
+        return min(max(val, minval), maxval)
 
-        if self.direction == UPRIGHT:
-            self.x += 1
-            self.y -= 5
-            if self.x >= WINDOWWIDTH - self.image.get_width():
-                self.direction = UPLEFT
-            if self.y <= self.max_height:
-                self.direction = DOWNRIGHT
+    def bounce(self):
+        if self.x > WINDOWWIDTH - self.size:
+            self.x = 2*(WINDOWWIDTH - self.size) - self.x
+            self.force.angle = - self.force.angle
 
-        if self.direction == UPLEFT:
-            self.x -= 1
-            self.y -= 5
-            if self.x <= 0:
-                self.direction = UPRIGHT
-            if self.y <= self.max_height:
-                self.direction = DOWNLEFT
+        elif self.x < self.size:
+            self.x = 2*self.size - self.x
+            self.force.angle = - self.force.angle
+
+        if self.y > WINDOWHEIGHT - self.size:
+            self.y = 2*(WINDOWHEIGHT - self.size) - self.y
+            self.force.angle = math.pi - self.force.angle
+
+        elif self.y < self.size:
+            self.y = 2*self.size - self.y
+            self.force.angle = math.pi - self.force.angle
 

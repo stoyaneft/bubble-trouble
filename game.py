@@ -21,7 +21,7 @@ class Game:
         gui = GUI(self.screen)
         world = Gameworld()
         while is_running:
-            self.screen.fill(WHITE)
+            self.screen.fill((250, 250, 250))
             world.update()
             for ball in world.balls:
                 gui.draw_ball(ball)
@@ -34,7 +34,7 @@ class Game:
                 end_game_label = myfont.render("Game over!", 1, RED)
                 end_game_rect = end_game_label.get_rect()
                 end_game_rect.centerx, end_game_rect.centery = WINDOWWIDTH/2, WINDOWHEIGHT/2
-                self.screen.blit(end_game_label)
+                self.screen.blit(end_game_label, end_game_rect)
                 self.pause()
             if world.level_completed:
                 myfont = pygame.font.SysFont("Comic Sans MS", 50)
@@ -72,7 +72,7 @@ class Game:
             if event.type == KEYUP:
                 if event.key == K_LEFT:
                     world.player.moving_left = False
-                elif event.type == KEYUP:
+                elif event.key == K_RIGHT:
                     world.player.moving_right = False
             if event.type == QUIT:
                 self.exit()
