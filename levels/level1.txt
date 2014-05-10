@@ -1,0 +1,2 @@
+time=30
+ball x, y=200, 150 size=5 speed=3, 0

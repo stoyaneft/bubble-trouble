@@ -1,6 +1,7 @@
 import pygame
+
 from settings import *
-from polar_vector import *
+
 
 class Ball(pygame.sprite.Sprite):
     def __init__(self, x, y, size, speed):
@@ -25,21 +26,5 @@ class Ball(pygame.sprite.Sprite):
 
     def clip(self, val, minval, maxval):
         return min(max(val, minval), maxval)
-
-    def bounce(self):
-        if self.x > WINDOWWIDTH - self.size:
-            self.x = 2*(WINDOWWIDTH - self.size) - self.x
-            self.force.angle = - self.force.angle
-
-        elif self.x < self.size:
-            self.x = 2*self.size - self.x
-            self.force.angle = - self.force.angle
-
-        if self.y > WINDOWHEIGHT - self.size:
-            self.y = 2*(WINDOWHEIGHT - self.size) - self.y
-            self.force.angle = math.pi - self.force.angle
-
-        elif self.y < self.size:
-            self.y = 2*self.size - self.y
-            self.force.angle = math.pi - self.force.angle
+    d
 
