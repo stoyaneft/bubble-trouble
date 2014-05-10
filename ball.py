@@ -3,7 +3,7 @@ from settings import *
 from polar_vector import *
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, x, y, size, speed=[3, 0]):
+    def __init__(self, x, y, size, speed):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load('images/ball' + str(size) + '.bmp')
         self.rect = self.image.get_rect(centerx=x, centery=y)

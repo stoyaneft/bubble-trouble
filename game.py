@@ -1,4 +1,7 @@
 import re
+from threading import Timer
+import time
+
 from ball import *
 from player import *
 
@@ -11,42 +14,55 @@ class Game:
         self.game_over = False
         self.level_completed = False
         self.is_running = True
-        self.is_paused = False
 
     def load_level(self, level):
         self.balls = []
         self.player.reset_position()
         self.level_completed = False
         self.level = level
+        self.player.is_alive = True
         level_path = "levels/level" + str(level) + ".txt"
         level_file = open(level_path, 'r')
         lines = level_file.readlines()
         lines = list(map(str.rstrip, lines))
         ball_re = re.compile(r'ball x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
+        time_re = re.compile(r'time=(\d+)')
         for line in lines:
-            match = re.match(ball_re, line)
-            x, y, size = list(map(int, match.groups()[:3]))
-            speed = list(map(int, match.groups()[3:]))
-            self.balls.append(Ball(x, y, size, speed))
+            ball_match = re.match(ball_re, line)
+            time_match = re.match(time_re, line)
+            if time_match:
+                time = int(time_match.group(1))
+                self.time_left = time
+            if ball_match:
+                x, y, size = tuple(map(int, ball_match.groups()[:3]))
+                speed = list(map(int, ball_match.groups()[3:]))
+                self.balls.append(Ball(x, y, size, speed))
+        self._timer(1, self._tick_second, self.time_left)
 
     def _check_for_collisions(self):
         for ball_index in range(len(self.balls)):
             ball = self.balls[ball_index]
             if pygame.sprite.collide_rect(ball, self.player.weapon) and self.player.weapon.is_active:
                 self.player.weapon.is_active = False
-                self.split_ball(ball_index)
+                self._split_ball(ball_index)
                 return
             if pygame.sprite.collide_rect(ball, self.player):
-                self.player.lives -= 1
-                if self.player.lives:
-                    self.load_level(self.level)
-                    pygame.time.wait(1000)
-                else:
-                    self.game_over = True
+                self.player.is_alive = False
+                self._decrease_lives()
                 return
 
+    def _decrease_lives(self):
+        self.player.lives -= 1
+        if self.player.lives:
+            self.restart()
+        else:
+            self.game_over = True
 
-    def split_ball(self, ball_index):
+    def restart(self):
+        self.pause(1)
+        self.load_level(self.level)
+
+    def _split_ball(self, ball_index):
         ball = self.balls[ball_index]
         if ball.size == 2:
             del self.balls[ball_index]
@@ -56,6 +72,12 @@ class Game:
             del self.balls[ball_index]
 
     def update(self):
+        if self.level_completed:
+            self.pause(3)
+            self.load_level(self.level + 1)
+        if self.game_over:
+            self.pause(3)
+            self.is_running = False
         self._check_for_collisions()
         for ball in self.balls:
             ball.update()
@@ -63,8 +85,22 @@ class Game:
         if not len(self.balls):
             self.level_completed = True
 
-    def pause(self):
-        self.is_paused = True
+    def _timer(self, interval, worker_func, iterations=0):
+        if iterations and self.player.is_alive:
+            Timer(
+                interval, self._timer,
+                [interval, worker_func, 0 if iterations == 0 else iterations-1]
+            ).start()
+            worker_func()
+
+    def _tick_second(self):
+        self.time_left -= 1
+        if self.time_left == 0:
+            self._decrease_lives()
+
+    @staticmethod
+    def pause(seconds):
+        time.sleep(seconds)
 
 
 
