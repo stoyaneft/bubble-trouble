@@ -8,7 +8,7 @@ Bubble trouble is a popular computer game where the purpose of the game is to de
 
 The following aspects of the game will be implemented (things labeled with M2 are expected to be done before 2nd milestone):
 - [M2]single player mode
-- [M2]two-player mode (on the same computer)
+- two-player mode (on the same computer)
 - [if enough time] two-player mode (using LAN)
 - [M2]a gui made with Pygame
 - [M2]user could load the game from any completed level
