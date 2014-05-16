@@ -4,7 +4,7 @@ Bubble Trouble
 Description
 -------------
 
-Bubble trouble is a popular computer game where the purpose of the game is to destroy dangerous bubbles, that bounce around the screen, by splitting them into smaller components and finally destroying them altogether. You could see a variation of the game <a>here <href=http://bgflash.com/flash/3155/bubble-struggle-2-rebubbled.html></a>  
+Bubble trouble is a popular computer game where the purpose of the game is to destroy dangerous bubbles, that bounce around the screen, by splitting them into smaller components and finally destroying them altogether. You could see a variation of the game <a>here <href=http://bgflash.com/flash/3155/bubble-struggle-2-rebubbled.html></a>.  
 
 The following aspects of the game will be implemented(things labeled with M2 are expected to be done before 2nd milestone):
 - [M2]single player mode
