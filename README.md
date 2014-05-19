@@ -15,6 +15,7 @@ The following aspects of the game will be implemented (things labeled with M2 ar
 - [M2] a gui made with Pygame
 - [M2] user could load the game from any completed level
 - bonuses dropping randomly
+- different types of "bubbles" - balls, hexagons...
 - [M2] timer for completion of levels
 - [M2] main menu and submenus
 - scoreboard
