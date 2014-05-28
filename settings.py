@@ -1,5 +1,4 @@
 import math
-from polar_vector import *
 
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
@@ -9,4 +8,5 @@ PLAYERSPEED = 5
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 200)
+BLACK = (0, 0, 0)
 GRAVITY = 1

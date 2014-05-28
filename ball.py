@@ -26,5 +26,4 @@ class Ball(pygame.sprite.Sprite):
 
     def clip(self, val, minval, maxval):
         return min(max(val, minval), maxval)
-    d
 
