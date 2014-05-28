@@ -1,4 +1,22 @@
-bubble-trouble
+Bubble Trouble
 ==============
 
-Game Bubble Trouble for FMI Python course 2014
+Description
+-------------
+
+Bubble trouble is a popular computer game where the purpose of the game is to destroy dangerous bubbles, that bounce around the screen, by splitting them into smaller components and finally destroying them altogether. You could see a variation of the game <a href=http://bgflash.com/flash/3155/bubble-struggle-2-rebubbled.html>here</a>.  
+
+The following aspects of the game will be implemented (things labeled with M2 are expected to be done before 2nd milestone):
+- [M2] single player mode
+- two-player mode (on the same computer)
+- stay alive mode (available for one or two players)
+- [if enough time] two-player mode (using LAN)
+- [if enough time] level creator
+- [M2] a gui made with Pygame
+- [M2] user could load the game from any completed level
+- bonuses dropping randomly
+- different types of "bubbles" - balls, hexagons...
+- [M2] timer for completion of levels
+- [M2] main menu and submenus
+- scoreboard
+- tests
