@@ -54,7 +54,10 @@ class Menu():
             total_height = len(functions) * height
             pos_x = self.scr_width/2 - width/2
             pos_y = self.scr_height/2 - total_height/2 + index*height
-            menu_option.set_position(pos_x, pos_y)
+            if menu_option.text == 'Back':
+                menu_option.set_position(20, self.scr_height - 40)
+            else:
+                menu_option.set_position(pos_x, pos_y)
             self.options.append(menu_option)
 
     def draw(self):

@@ -25,9 +25,12 @@ def start_level(level):
         clock.tick(FPS)
 
 
-#def load_level_menu():
-
-
+def start_main_menu():
+    while main_menu.is_active:
+        main_menu.draw()
+        handle_menu_event(main_menu)
+        pygame.display.update()
+        clock.tick(FPS)
 
 
 def load_level():
@@ -47,11 +50,10 @@ def quit_game():
 
 
 main_menu = Menu(screen, OrderedDict([('New game', (start_level, 1)), ('Load level', load_level), ('Quit', quit_game)]))
+levels_available = [(str(lvl), (start_level, lvl)) for lvl in game.levels_available]
+levels_available.append(('Back', start_main_menu))
+load_level_menu = Menu(screen, OrderedDict(levels_available))
 
-#x = [(comp_lvl, (game.load_level, comp_lvl) for comp_lvl in game.levels_available)]
-load_level_menu = Menu(screen, OrderedDict(
-    [(str(comp_lvl), (start_level, comp_lvl)) for comp_lvl in game.levels_available]
-))
 
 def draw_ball(ball):
     screen.blit(ball.image, ball.rect)
@@ -120,7 +122,10 @@ def handle_menu_event(menu):
             quit_game()
         elif event.type == KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                quit_game()
+                if menu == main_menu:
+                    quit_game()
+                else:
+                    start_main_menu()
             if (event.key == pygame.K_UP or event.key == pygame.K_DOWN) and menu.current_option is None:
                 menu.current_option = 0
                 pygame.mouse.set_visible(False)
@@ -149,10 +154,4 @@ def handle_menu_event(menu):
             pygame.mouse.set_visible(True)
             menu.current_option = None
 
-
-while main_menu.is_active:
-    main_menu.draw()
-    handle_menu_event(main_menu)
-    pygame.display.update()
-    clock.tick(FPS)
 
