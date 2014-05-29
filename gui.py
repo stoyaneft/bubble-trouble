@@ -1,6 +1,6 @@
-import sys
-
 from pygame.locals import *
+from collections import OrderedDict
+
 from game import *
 from menu import *
 
@@ -11,12 +11,11 @@ screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("monospace", 30)
 game = Game()
-pygame.time.set_timer(USEREVENT+1, 1000)
 
 
-def new_game():
-    game.start_timer()
-    menu.is_active = False
+def start_level(level):
+    game.load_level(level)
+    main_menu.is_active = False
     pygame.mouse.set_visible(False)
     while game.is_running:
         draw_world()
@@ -26,14 +25,33 @@ def new_game():
         clock.tick(FPS)
 
 
+#def load_level_menu():
+
+
+
+
+def load_level():
+    while load_level_menu.is_active:
+        load_level_menu.draw()
+        handle_menu_event(load_level_menu)
+        pygame.display.update()
+        clock.tick(FPS)
+
+
 def quit_game():
     game.is_running = False
-    menu.is_active = False
+    main_menu.is_active = False
     pygame.quit()
     sys.exit()
 
-menu = Menu(screen, ('New game', 'Quit'), {'New game': new_game, 'Quit': quit_game})
 
+
+main_menu = Menu(screen, OrderedDict([('New game', (start_level, 1)), ('Load level', load_level), ('Quit', quit_game)]))
+
+#x = [(comp_lvl, (game.load_level, comp_lvl) for comp_lvl in game.levels_available)]
+load_level_menu = Menu(screen, OrderedDict(
+    [(str(comp_lvl), (start_level, comp_lvl)) for comp_lvl in game.levels_available]
+))
 
 def draw_ball(ball):
     screen.blit(ball.image, ball.rect)
@@ -96,7 +114,7 @@ def handle_game_event():
             quit_game()
 
 
-def handle_menu_event():
+def handle_menu_event(menu):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             quit_game()
@@ -106,30 +124,35 @@ def handle_menu_event():
             if (event.key == pygame.K_UP or event.key == pygame.K_DOWN) and menu.current_option is None:
                 menu.current_option = 0
                 pygame.mouse.set_visible(False)
-            if event.key == pygame.K_UP and menu.current_option > 0:
+            elif event.key == pygame.K_UP and menu.current_option > 0:
                 menu.current_option -= 1
-            elif event.key == pygame.K_UP and menu.current_option == 0:
+            elif event.key == pygame.K_UP and main_menu.current_option == 0:
                 menu.current_option = len(menu.options) - 1
             elif event.key == pygame.K_DOWN and menu.current_option < len(menu.options) - 1:
                 menu.current_option += 1
             elif event.key == pygame.K_DOWN and menu.current_option == len(menu.options) - 1:
                 menu.current_option = 0
-            elif event.key == pygame.K_RETURN or event.key == pygame.K_RIGHT:
-                menu.functions[menu.options[menu.current_option].text]()
+            elif event.key == pygame.K_RETURN:
+                if not isinstance(menu.functions[menu.options[menu.current_option].text], tuple):
+                    menu.functions[menu.options[menu.current_option].text]()
+                else:
+                    menu.functions[menu.options[menu.current_option].text][0](menu.functions[menu.options[menu.current_option].text][1])
 
         elif event.type == MOUSEBUTTONUP:
             for option in menu.options:
                 if option.is_selected:
-                    menu.functions[option.text]()
+                    if not isinstance(menu.functions[option.text], tuple):
+                        menu.functions[option.text]()
+                    else:
+                        menu.functions[option.text][0](menu.functions[option.text][1])
         if pygame.mouse.get_rel() != (0, 0):
             pygame.mouse.set_visible(True)
             menu.current_option = None
 
 
-def start_game():
-    while menu.is_active:
-        menu.draw()
-        handle_menu_event()
-        pygame.display.update()
-        clock.tick(FPS)
+while main_menu.is_active:
+    main_menu.draw()
+    handle_menu_event(main_menu)
+    pygame.display.update()
+    clock.tick(FPS)
 

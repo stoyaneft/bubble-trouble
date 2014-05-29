@@ -1,9 +1,10 @@
 import pygame
+
 from settings import *
 
 
 class MenuOption (pygame.font.Font):
-    def __init__(self, text, position=(0, 0), function=None, font=None, font_size=36, font_color=WHITE):
+    def __init__(self, text, position=(0, 0), font=None, font_size=36, font_color=WHITE):
         pygame.font.Font.__init__(self, font, font_size)
         self.text = text
         self.font_size = font_size
@@ -11,7 +12,6 @@ class MenuOption (pygame.font.Font):
         self.label = self.render(self.text, 1, font_color)
         self.rect = self.label.get_rect(left=position[0], top=position[1])
         self.position = position
-        self.function = function
         self.is_selected = False
 
     def set_position(self, x, y):
@@ -38,7 +38,7 @@ class MenuOption (pygame.font.Font):
 
 
 class Menu():
-    def __init__(self, screen, options, functions, bg_color=BLACK):
+    def __init__(self, screen, functions, bg_color=BLACK):
         self.is_active = True
         self.screen = screen
         self.scr_width = self.screen.get_rect().width
@@ -47,11 +47,11 @@ class Menu():
         self.options = []
         self.current_option = None
         self.functions = functions
-        for index, option in enumerate(options):
+        for index, option in enumerate(functions.keys()):
             menu_option = MenuOption(option)
             width = menu_option.rect.width
             height = menu_option.rect.height
-            total_height = len(options) * height
+            total_height = len(functions) * height
             pos_x = self.scr_width/2 - width/2
             pos_y = self.scr_height/2 - total_height/2 + index*height
             menu_option.set_position(pos_x, pos_y)

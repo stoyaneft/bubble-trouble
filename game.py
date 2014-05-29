@@ -12,10 +12,12 @@ class Game:
         self.balls = []
         self.player = Player()
         self.level = level
-        self.load_level(1)
         self.game_over = False
         self.level_completed = False
         self.is_running = True
+        with open('levels_available', 'r') as levels_available_file:
+                levels_available = levels_available_file.read()
+                self.levels_available = list(map(int, levels_available.split()))
 
     def load_level(self, level):
         self.balls = []
@@ -23,6 +25,10 @@ class Game:
         self.level_completed = False
         self.level = level
         self.player.is_alive = True
+        with open('levels_available', 'a') as levels_available:
+            if self.level not in self.levels_available:
+                levels_available.write(" " + str(self.level))
+                self.levels_available.append(self.level)
         ball_re = re.compile(r'ball x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
         time_re = re.compile(r'time=(\d+)')
         level_path = "levels/level" + str(level) + ".txt"
@@ -39,8 +45,9 @@ class Game:
                     x, y, size = tuple(map(int, ball_match.groups()[:3]))
                     speed = list(map(int, ball_match.groups()[3:]))
                     self.balls.append(Ball(x, y, size, speed))
+            self._start_timer()
 
-    def start_timer(self):
+    def _start_timer(self):
         self._timer(1, self._tick_second, self.time_left)
 
     def _check_for_collisions(self):
@@ -92,7 +99,7 @@ class Game:
             self.level_completed = True
 
     def _timer(self, interval, worker_func, iterations=0):
-        if iterations and self.player.is_alive:
+        if iterations and self.player.is_alive and not self.level_completed:
             Timer(
                 interval, self._timer,
                 [interval, worker_func, 0 if iterations == 0 else iterations-1]
