@@ -1,3 +1,4 @@
 time=30
-ball x, y=100, 250 size=4 speed=3, 7
-ball x, y=500, 300 size=3 speed=2, 3
+ball x, y=100, 250 size=3 speed=3, 7
+ball x, y=500, 300 size=2 speed=2, 3
+hex x, y=200, 200 size=2 speed=5, 5

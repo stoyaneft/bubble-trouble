@@ -4,12 +4,14 @@ import time
 import sys
 
 from ball import *
+from hexagon import *
 from player import *
 
 
 class Game:
     def __init__(self, level=1):
         self.balls = []
+        self.hexagons = []
         self.player = Player()
         self.level = level
         self.game_over = False
@@ -21,6 +23,7 @@ class Game:
 
     def load_level(self, level):
         self.balls = []
+        self.hexagons = []
         self.player.reset_position()
         self.level_completed = False
         self.level = level
@@ -30,6 +33,7 @@ class Game:
                 levels_available.write(" " + str(self.level))
                 self.levels_available.append(self.level)
         ball_re = re.compile(r'ball x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
+        hex_re = re.compile(r'hex x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
         time_re = re.compile(r'time=(\d+)')
         level_path = "levels/level" + str(level) + ".txt"
         with open(level_path, 'r') as level_file:
@@ -37,6 +41,7 @@ class Game:
             lines = list(map(str.rstrip, lines))
             for line in lines:
                 ball_match = re.match(ball_re, line)
+                hex_match = re.match(hex_re, line)
                 time_match = re.match(time_re, line)
                 if time_match:
                     time = int(time_match.group(1))
@@ -45,6 +50,10 @@ class Game:
                     x, y, size = tuple(map(int, ball_match.groups()[:3]))
                     speed = list(map(int, ball_match.groups()[3:]))
                     self.balls.append(Ball(x, y, size, speed))
+                if hex_match:
+                    x, y, size = tuple(map(int, hex_match.groups()[:3]))
+                    speed = list(map(int, hex_match.groups()[3:]))
+                    self.hexagons.append(Hexagon(x, y, size, speed))
             self._start_timer()
 
     def _start_timer(self):
@@ -58,6 +67,16 @@ class Game:
                 self._split_ball(ball_index)
                 return
             if pygame.sprite.collide_rect(ball, self.player):
+                self.player.is_alive = False
+                self._decrease_lives()
+                return
+        for hex_index in range(len(self.hexagons)):
+            hexagon = self.hexagons[hex_index]
+            if pygame.sprite.collide_rect(hexagon, self.player.weapon) and self.player.weapon.is_active:
+                self.player.weapon.is_active = False
+                self._split_hexagon(hex_index)
+                return
+            if pygame.sprite.collide_rect(hexagon, self.player):
                 self.player.is_alive = False
                 self._decrease_lives()
                 return
@@ -75,12 +94,17 @@ class Game:
 
     def _split_ball(self, ball_index):
         ball = self.balls[ball_index]
-        if ball.size == 2:
-            del self.balls[ball_index]
-        else:
+        if ball.size > 1:
             self.balls.append(Ball(ball.rect.left - 25, ball.rect.top - 10, ball.size - 1, [-3, -5]))
             self.balls.append(Ball(ball.rect.left + 25, ball.rect.top - 10, ball.size - 1, [3, -5]))
-            del self.balls[ball_index]
+        del self.balls[ball_index]
+
+    def _split_hexagon(self, hex_index):
+        hexagon = self.hexagons[hex_index]
+        if hexagon.size > 1:
+            self.hexagons.append(Hexagon(hexagon.rect.left - 25, hexagon.rect.top - 10, hexagon.size - 1, [-3, -5]))
+            self.hexagons.append(Hexagon(hexagon.rect.left + 25, hexagon.rect.top - 10, hexagon.size - 1, [3, -5]))
+        del self.hexagons[hex_index]
 
     def update(self):
         if self.level_completed:
@@ -94,8 +118,10 @@ class Game:
         self._check_for_collisions()
         for ball in self.balls:
             ball.update()
+        for hexagon in self.hexagons:
+            hexagon.update()
         self.player.update()
-        if not len(self.balls):
+        if not len(self.balls) and not len(self.hexagons):
             self.level_completed = True
 
     def _timer(self, interval, worker_func, iterations=0):

@@ -33,7 +33,7 @@ def start_main_menu():
         clock.tick(FPS)
 
 
-def load_level():
+def start_load_level_menu():
     while load_level_menu.is_active:
         load_level_menu.draw()
         handle_menu_event(load_level_menu)
@@ -42,14 +42,11 @@ def load_level():
 
 
 def quit_game():
-    game.is_running = False
-    main_menu.is_active = False
     pygame.quit()
     sys.exit()
 
 
-
-main_menu = Menu(screen, OrderedDict([('New game', (start_level, 1)), ('Load level', load_level), ('Quit', quit_game)]))
+main_menu = Menu(screen, OrderedDict([('New game', (start_level, 1)), ('Load level', start_load_level_menu), ('Quit', quit_game)]))
 levels_available = [(str(lvl), (start_level, lvl)) for lvl in game.levels_available]
 levels_available.append(('Back', start_main_menu))
 load_level_menu = Menu(screen, OrderedDict(levels_available))
@@ -57,6 +54,10 @@ load_level_menu = Menu(screen, OrderedDict(levels_available))
 
 def draw_ball(ball):
     screen.blit(ball.image, ball.rect)
+
+
+def draw_hex(hexagon):
+    screen.blit(hexagon.image, hexagon.rect)
 
 
 def draw_player(player):
@@ -83,16 +84,18 @@ def draw_timer():
 
 
 def draw_world():
-    screen.fill((250, 250, 250))
+    screen.fill(WHITE)
     if game.game_over:
         draw_message("Game over!", RED)
     if game.level_completed:
         draw_message("Well done! Level completed!", BLUE)
+    for hexagon in game.hexagons:
+        draw_hex(hexagon)
     for ball in game.balls:
         draw_ball(ball)
-    draw_player(game.player)
     if game.player.weapon.is_active:
         draw_weapon(game.player.weapon)
+    draw_player(game.player)
     draw_timer()
 
 

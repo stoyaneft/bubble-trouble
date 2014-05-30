@@ -1,5 +1,3 @@
-import math
-
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
 FPS = 30

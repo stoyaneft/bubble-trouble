@@ -1,13 +1,8 @@
-import pygame
-from settings import *
 from weapon import *
-
-LEFT = 'left'
-RIGHT = 'right'
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
-        self.image = pygame.image.load('images/player.bmp')
+        self.image = pygame.image.load('images/player.png')
         self.rect = self.image.get_rect()
         self.weapon = Weapon()
         self.moving_left = False
@@ -30,5 +25,4 @@ class Player(pygame.sprite.Sprite):
 
     def reset_position(self):
         self.rect.bottom, self.rect.centerx = WINDOWHEIGHT, WINDOWWIDTH/2
-
 
