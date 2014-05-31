@@ -4,9 +4,11 @@ from settings import *
 
 
 class MenuOption (pygame.font.Font):
-    def __init__(self, text, position=(0, 0), font=None, font_size=36, font_color=WHITE):
+    def __init__(self, text, function,
+                 position=(0, 0), font=None, font_size=36, font_color=WHITE):
         pygame.font.Font.__init__(self, font, font_size)
         self.text = text
+        self.function = function
         self.font_size = font_size
         self.font_color = font_color
         self.label = self.render(self.text, 1, font_color)
@@ -21,19 +23,18 @@ class MenuOption (pygame.font.Font):
     def highlight(self, color=RED):
         self.font_color = color
         self.label = self.render(self.text, 1, self.font_color)
+        self.is_selected = True
 
     def unhighlight(self):
         self.font_color = WHITE
-        self.set_italic(False)
         self.label = self.render(self.text, 1, self.font_color)
+        self.is_selected = False
 
     def check_for_mouse_selection(self, mouse_pos):
         if self.rect.collidepoint(mouse_pos):
             self.highlight()
-            self.is_selected = True
         else:
             self.unhighlight()
-            self.is_selected = False
 
 
 class Menu():
@@ -47,7 +48,7 @@ class Menu():
         self.current_option = None
         self.functions = functions
         for index, option in enumerate(functions.keys()):
-            menu_option = MenuOption(option)
+            menu_option = MenuOption(option, functions[option])
             width = menu_option.rect.width
             height = menu_option.rect.height
             total_height = len(functions) * height

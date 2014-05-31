@@ -9,6 +9,7 @@ from player import *
 
 
 class Game:
+
     def __init__(self, level=1):
         self.balls = []
         self.hexagons = []
@@ -20,8 +21,8 @@ class Game:
         self.is_completed = False
         self.max_level = 5
         with open('levels_available', 'r') as levels_available_file:
-                levels_available = levels_available_file.read()
-                self.levels_available = list(map(int, levels_available.split()))
+            levels_available = levels_available_file.read()
+            self.levels_available = list(map(int, levels_available.split()))
 
     def load_level(self, level):
         self.balls = []
@@ -34,8 +35,10 @@ class Game:
             if self.level not in self.levels_available:
                 levels_available.write(" " + str(self.level))
                 self.levels_available.append(self.level)
-        ball_re = re.compile(r'ball x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
-        hex_re = re.compile(r'hex x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
+        ball_re = re.compile(
+            r'ball x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
+        hex_re = re.compile(
+            r'hex x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
         time_re = re.compile(r'time=(\d+)')
         level_path = "levels/level" + str(level) + ".txt"
         with open(level_path, 'r') as level_file:
@@ -64,7 +67,8 @@ class Game:
     def _check_for_collisions(self):
         for ball_index in range(len(self.balls)):
             ball = self.balls[ball_index]
-            if pygame.sprite.collide_rect(ball, self.player.weapon) and self.player.weapon.is_active:
+            if pygame.sprite.collide_rect(ball, self.player.weapon) \
+                    and self.player.weapon.is_active:
                 self.player.weapon.is_active = False
                 self._split_ball(ball_index)
                 return
@@ -74,7 +78,8 @@ class Game:
                 return
         for hex_index in range(len(self.hexagons)):
             hexagon = self.hexagons[hex_index]
-            if pygame.sprite.collide_rect(hexagon, self.player.weapon) and self.player.weapon.is_active:
+            if pygame.sprite.collide_rect(hexagon, self.player.weapon) \
+                    and self.player.weapon.is_active:
                 self.player.weapon.is_active = False
                 self._split_hexagon(hex_index)
                 return
@@ -97,15 +102,25 @@ class Game:
     def _split_ball(self, ball_index):
         ball = self.balls[ball_index]
         if ball.size > 1:
-            self.balls.append(Ball(ball.rect.left - ball.size**2, ball.rect.top - 10, ball.size - 1, [-3, -5]))
-            self.balls.append(Ball(ball.rect.left + ball.size**2, ball.rect.top - 10, ball.size - 1, [3, -5]))
+            self.balls.append(Ball(
+                ball.rect.left - ball.size ** 2,
+                ball.rect.top - 10, ball.size - 1, [-3, -5])
+            )
+            self.balls.append(
+                Ball(ball.rect.left + ball.size ** 2,
+                     ball.rect.top - 10, ball.size - 1, [3, -5])
+            )
         del self.balls[ball_index]
 
     def _split_hexagon(self, hex_index):
         hexagon = self.hexagons[hex_index]
         if hexagon.size > 1:
-            self.hexagons.append(Hexagon(hexagon.rect.left, hexagon.rect.centery, hexagon.size - 1, [-3, -5]))
-            self.hexagons.append(Hexagon(hexagon.rect.right, hexagon.rect.centery, hexagon.size - 1, [3, -5]))
+            self.hexagons.append(
+                Hexagon(hexagon.rect.left, hexagon.rect.centery,
+                        hexagon.size - 1, [-3, -5]))
+            self.hexagons.append(
+                Hexagon(hexagon.rect.right, hexagon.rect.centery,
+                        hexagon.size - 1, [3, -5]))
         del self.hexagons[hex_index]
 
     def update(self):
@@ -132,7 +147,8 @@ class Game:
         if iterations and self.player.is_alive and not self.level_completed:
             Timer(
                 interval, self._timer,
-                [interval, worker_func, 0 if iterations == 0 else iterations-1]
+                [interval, worker_func, 0 if iterations ==
+                    0 else iterations - 1]
             ).start()
             worker_func()
 
@@ -144,7 +160,3 @@ class Game:
     @staticmethod
     def pause(seconds):
         time.sleep(seconds)
-
-
-
-

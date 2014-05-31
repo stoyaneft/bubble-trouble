@@ -4,6 +4,7 @@ from settings import *
 
 
 class Ball(pygame.sprite.Sprite):
+
     def __init__(self, x, y, size, speed):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load('images/ball' + str(size) + '.png')
@@ -25,4 +26,3 @@ class Ball(pygame.sprite.Sprite):
 
     def clip(self, val, minval, maxval):
         return min(max(val, minval), maxval)
-

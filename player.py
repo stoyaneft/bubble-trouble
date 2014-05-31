@@ -1,6 +1,8 @@
 from weapon import *
 
+
 class Player(pygame.sprite.Sprite):
+
     def __init__(self):
         self.image = pygame.image.load('images/player.png')
         self.rect = self.image.get_rect()
@@ -24,5 +26,4 @@ class Player(pygame.sprite.Sprite):
             self.weapon.update()
 
     def reset_position(self):
-        self.rect.bottom, self.rect.centerx = WINDOWHEIGHT, WINDOWWIDTH/2
-
+        self.rect.bottom, self.rect.centerx = WINDOWHEIGHT, WINDOWWIDTH / 2

@@ -46,8 +46,12 @@ def quit_game():
     sys.exit()
 
 
-main_menu = Menu(screen, OrderedDict([('New game', (start_level, 1)), ('Load level', start_load_level_menu), ('Quit', quit_game)]))
-levels_available = [(str(lvl), (start_level, lvl)) for lvl in game.levels_available]
+main_menu = Menu(screen, OrderedDict(
+    [('New game', (start_level, 1)), ('Load level', start_load_level_menu),
+     ('Quit', quit_game)])
+)
+levels_available = [(str(lvl), (start_level, lvl))
+                    for lvl in game.levels_available]
 levels_available.append(('Back', start_main_menu))
 load_level_menu = Menu(screen, OrderedDict(levels_available))
 
@@ -132,32 +136,37 @@ def handle_menu_event(menu):
                     quit_game()
                 else:
                     start_main_menu()
-            if (event.key == pygame.K_UP or event.key == pygame.K_DOWN) and menu.current_option is None:
+            if (event.key == pygame.K_UP or event.key == pygame.K_DOWN)\
+                    and menu.current_option is None:
                 menu.current_option = 0
                 pygame.mouse.set_visible(False)
             elif event.key == pygame.K_UP and menu.current_option > 0:
                 menu.current_option -= 1
             elif event.key == pygame.K_UP and menu.current_option == 0:
                 menu.current_option = len(menu.options) - 1
-            elif event.key == pygame.K_DOWN and menu.current_option < len(menu.options) - 1:
+            elif event.key == pygame.K_DOWN \
+                    and menu.current_option < len(menu.options) - 1:
                 menu.current_option += 1
-            elif event.key == pygame.K_DOWN and menu.current_option == len(menu.options) - 1:
+            elif event.key == pygame.K_DOWN \
+                    and menu.current_option == len(menu.options) - 1:
                 menu.current_option = 0
             elif event.key == pygame.K_RETURN:
-                if not isinstance(menu.functions[menu.options[menu.current_option].text], tuple):
-                    menu.functions[menu.options[menu.current_option].text]()
+                if not isinstance(
+                        menu.options[menu.current_option].function, tuple
+                ):
+                    menu.options[menu.current_option].function()
                 else:
-                    menu.functions[menu.options[menu.current_option].text][0](menu.functions[menu.options[menu.current_option].text][1])
+                    menu.options[menu.current_option].function[0](
+                        menu.options[menu.current_option].function[1]
+                    )
 
         elif event.type == MOUSEBUTTONUP:
             for option in menu.options:
                 if option.is_selected:
-                    if not isinstance(menu.functions[option.text], tuple):
-                        menu.functions[option.text]()
+                    if not isinstance(option.function, tuple):
+                        option.function()
                     else:
-                        menu.functions[option.text][0](menu.functions[option.text][1])
+                        option.function[0](option.function[1])
         if pygame.mouse.get_rel() != (0, 0):
             pygame.mouse.set_visible(True)
             menu.current_option = None
-
-
