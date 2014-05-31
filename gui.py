@@ -85,10 +85,6 @@ def draw_timer():
 
 def draw_world():
     screen.fill(WHITE)
-    if game.game_over:
-        draw_message("Game over!", RED)
-    if game.level_completed:
-        draw_message("Well done! Level completed!", BLUE)
     for hexagon in game.hexagons:
         draw_hex(hexagon)
     for ball in game.balls:
@@ -97,6 +93,13 @@ def draw_world():
         draw_weapon(game.player.weapon)
     draw_player(game.player)
     draw_timer()
+    if game.game_over:
+        draw_message("Game over!", RED)
+    if game.is_completed:
+        draw_message("Congratulations! You win!!!", PURPLE)
+        start_main_menu()
+    if game.level_completed and not game.is_completed:
+        draw_message("Well done! Level completed!", BLUE)
 
 
 def handle_game_event():
@@ -134,7 +137,7 @@ def handle_menu_event(menu):
                 pygame.mouse.set_visible(False)
             elif event.key == pygame.K_UP and menu.current_option > 0:
                 menu.current_option -= 1
-            elif event.key == pygame.K_UP and main_menu.current_option == 0:
+            elif event.key == pygame.K_UP and menu.current_option == 0:
                 menu.current_option = len(menu.options) - 1
             elif event.key == pygame.K_DOWN and menu.current_option < len(menu.options) - 1:
                 menu.current_option += 1

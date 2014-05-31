@@ -17,6 +17,8 @@ class Game:
         self.game_over = False
         self.level_completed = False
         self.is_running = True
+        self.is_completed = False
+        self.max_level = 5
         with open('levels_available', 'r') as levels_available_file:
                 levels_available = levels_available_file.read()
                 self.levels_available = list(map(int, levels_available.split()))
@@ -95,19 +97,19 @@ class Game:
     def _split_ball(self, ball_index):
         ball = self.balls[ball_index]
         if ball.size > 1:
-            self.balls.append(Ball(ball.rect.left - 25, ball.rect.top - 10, ball.size - 1, [-3, -5]))
-            self.balls.append(Ball(ball.rect.left + 25, ball.rect.top - 10, ball.size - 1, [3, -5]))
+            self.balls.append(Ball(ball.rect.left - ball.size**2, ball.rect.top - 10, ball.size - 1, [-3, -5]))
+            self.balls.append(Ball(ball.rect.left + ball.size**2, ball.rect.top - 10, ball.size - 1, [3, -5]))
         del self.balls[ball_index]
 
     def _split_hexagon(self, hex_index):
         hexagon = self.hexagons[hex_index]
         if hexagon.size > 1:
-            self.hexagons.append(Hexagon(hexagon.rect.left - 25, hexagon.rect.top - 10, hexagon.size - 1, [-3, -5]))
-            self.hexagons.append(Hexagon(hexagon.rect.left + 25, hexagon.rect.top - 10, hexagon.size - 1, [3, -5]))
+            self.hexagons.append(Hexagon(hexagon.rect.left, hexagon.rect.centery, hexagon.size - 1, [-3, -5]))
+            self.hexagons.append(Hexagon(hexagon.rect.right, hexagon.rect.centery, hexagon.size - 1, [3, -5]))
         del self.hexagons[hex_index]
 
     def update(self):
-        if self.level_completed:
+        if self.level_completed and not self.is_completed:
             self.pause(3)
             self.load_level(self.level + 1)
         if self.game_over:
@@ -123,6 +125,8 @@ class Game:
         self.player.update()
         if not len(self.balls) and not len(self.hexagons):
             self.level_completed = True
+            if self.level == self.max_level:
+                self.is_completed = True
 
     def _timer(self, interval, worker_func, iterations=0):
         if iterations and self.player.is_alive and not self.level_completed:

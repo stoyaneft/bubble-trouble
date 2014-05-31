@@ -20,7 +20,6 @@ class MenuOption (pygame.font.Font):
 
     def highlight(self, color=RED):
         self.font_color = color
-        self.set_italic(True)
         self.label = self.render(self.text, 1, self.font_color)
 
     def unhighlight(self):

@@ -1,3 +1,2 @@
-time=30
+time=20
 ball x, y=200, 250 size=3 speed=3, 0
-hex x, y=400, 200 size=3 speed=5, 5

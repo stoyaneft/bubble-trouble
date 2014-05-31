@@ -1,6 +1,7 @@
 import pygame
 from settings import *
 
+
 class Weapon(pygame.sprite.Sprite):
     def __init__(self, x=0, y=0):
         #self.type = type
@@ -14,5 +15,5 @@ class Weapon(pygame.sprite.Sprite):
             if self.rect.top <= 0:
                 self.is_active = False
             else:
-                self.rect =  self.rect.move(0, -WEAPONSPEED)
+                self.rect = self.rect.move(0, -WEAPONSPEED)
 
