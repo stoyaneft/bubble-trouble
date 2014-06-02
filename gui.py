@@ -51,7 +51,7 @@ main_menu = Menu(screen, OrderedDict(
      ('Quit', quit_game)])
 )
 levels_available = [(str(lvl), (start_level, lvl))
-                    for lvl in game.levels_available]
+                    for lvl in range(1, game.max_level_available + 1)]
 levels_available.append(('Back', start_main_menu))
 load_level_menu = Menu(screen, OrderedDict(levels_available))
 

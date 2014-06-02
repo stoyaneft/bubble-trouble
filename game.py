@@ -20,9 +20,12 @@ class Game:
         self.is_running = True
         self.is_completed = False
         self.max_level = 5
-        with open('levels_available', 'r') as levels_available_file:
-            levels_available = levels_available_file.read()
-            self.levels_available = list(map(int, levels_available.split()))
+        with open('max_level_available', 'r') as max_completed_level_file:
+            max_level_available = max_completed_level_file.read()
+            if max_level_available:
+                self.max_level_available = int(max_level_available)
+            else:
+                self.max_level_available = 1
 
     def load_level(self, level):
         self.balls = []
@@ -31,10 +34,10 @@ class Game:
         self.level_completed = False
         self.level = level
         self.player.is_alive = True
-        with open('levels_available', 'a') as levels_available:
-            if self.level not in self.levels_available:
-                levels_available.write(" " + str(self.level))
-                self.levels_available.append(self.level)
+        with open('max_level_available', 'w') as max_completed_level_file:
+            if self.level > self.max_level_available:
+                max_completed_level_file.write(str(self.level))
+                self.max_level_available = self.level
         ball_re = re.compile(
             r'ball x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
         hex_re = re.compile(
@@ -125,6 +128,7 @@ class Game:
 
     def update(self):
         if self.level_completed and not self.is_completed:
+            #self.max_level_available += 1
             self.pause(3)
             self.load_level(self.level + 1)
         if self.game_over:
