@@ -9,7 +9,7 @@ pygame.display.set_caption('Bubble Trouble')
 pygame.mouse.set_visible(True)
 screen = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
 clock = pygame.time.Clock()
-font = pygame.font.SysFont("monospace", 30)
+font = pygame.font.SysFont('monospace', 30)
 game = Game()
 
 
@@ -46,13 +46,16 @@ def quit_game():
     sys.exit()
 
 
+def back():
+    load_level_menu.is_active = False
+
 main_menu = Menu(screen, OrderedDict(
     [('New game', (start_level, 1)), ('Load level', start_load_level_menu),
      ('Quit', quit_game)])
 )
 levels_available = [(str(lvl), (start_level, lvl))
                     for lvl in range(1, game.max_level_available + 1)]
-levels_available.append(('Back', start_main_menu))
+levels_available.append(('Back', back))
 load_level_menu = Menu(screen, OrderedDict(levels_available))
 
 
@@ -98,12 +101,12 @@ def draw_world():
     draw_player(game.player)
     draw_timer()
     if game.game_over:
-        draw_message("Game over!", RED)
+        draw_message('Game over!', RED)
     if game.is_completed:
-        draw_message("Congratulations! You win!!!", PURPLE)
+        draw_message('Congratulations! You win!!!', PURPLE)
         start_main_menu()
     if game.level_completed and not game.is_completed:
-        draw_message("Well done! Level completed!", BLUE)
+        draw_message('Well done! Level completed!', BLUE)
 
 
 def handle_game_event():
@@ -130,6 +133,7 @@ def handle_menu_event(menu):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             quit_game()
+
         elif event.type == KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 if menu == main_menu:
@@ -151,14 +155,11 @@ def handle_menu_event(menu):
                     and menu.current_option == len(menu.options) - 1:
                 menu.current_option = 0
             elif event.key == pygame.K_RETURN:
-                if not isinstance(
-                        menu.options[menu.current_option].function, tuple
-                ):
-                    menu.options[menu.current_option].function()
+                option = menu.options[menu.current_option]
+                if not isinstance(option.function, tuple):
+                    option.function()
                 else:
-                    menu.options[menu.current_option].function[0](
-                        menu.options[menu.current_option].function[1]
-                    )
+                    option.function[0](option.function[1])
 
         elif event.type == MOUSEBUTTONUP:
             for option in menu.options:
@@ -167,6 +168,7 @@ def handle_menu_event(menu):
                         option.function()
                     else:
                         option.function[0](option.function[1])
+
         if pygame.mouse.get_rel() != (0, 0):
             pygame.mouse.set_visible(True)
             menu.current_option = None

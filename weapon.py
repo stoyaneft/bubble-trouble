@@ -8,7 +8,7 @@ class Weapon(pygame.sprite.Sprite):
         # self.type = type
         self.is_active = False
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("images/arrow.png")
+        self.image = pygame.image.load('images/arrow.png')
         self.rect = self.image.get_rect(centerx=x, top=y)
 
     def update(self):

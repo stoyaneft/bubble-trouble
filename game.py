@@ -1,3 +1,4 @@
+import json
 import re
 from threading import Timer
 import time
@@ -38,31 +39,21 @@ class Game:
             if self.level > self.max_level_available:
                 max_completed_level_file.write(str(self.level))
                 self.max_level_available = self.level
-        ball_re = re.compile(
-            r'ball x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
-        hex_re = re.compile(
-            r'hex x, y=(\d+), (\d+) size=(\d+) speed=(\d+), (\d+)')
-        time_re = re.compile(r'time=(\d+)')
-        level_path = "levels/level" + str(level) + ".txt"
-        with open(level_path, 'r') as level_file:
-            lines = level_file.readlines()
-            lines = list(map(str.rstrip, lines))
-            for line in lines:
-                ball_match = re.match(ball_re, line)
-                hex_match = re.match(hex_re, line)
-                time_match = re.match(time_re, line)
-                if time_match:
-                    time = int(time_match.group(1))
-                    self.time_left = time
-                if ball_match:
-                    x, y, size = tuple(map(int, ball_match.groups()[:3]))
-                    speed = list(map(int, ball_match.groups()[3:]))
-                    self.balls.append(Ball(x, y, size, speed))
-                if hex_match:
-                    x, y, size = tuple(map(int, hex_match.groups()[:3]))
-                    speed = list(map(int, hex_match.groups()[3:]))
-                    self.hexagons.append(Hexagon(x, y, size, speed))
-            self._start_timer()
+        with open('levels.json', 'r') as levels_file:
+            levels = json.load(levels_file)
+            level = levels[str(self.level)]
+            self.time_left = level['time']
+            for ball in level['balls']:
+                x, y = ball['x'], ball['y']
+                size = ball['size']
+                speed = ball['speed']
+                self.balls.append(Ball(x, y, size, speed))
+            for hexagon in level['hexagons']:
+                x, y = hexagon['x'], hexagon['y']
+                size = hexagon['size']
+                speed = hexagon['speed']
+                self.hexagons.append(Hexagon(x, y, size, speed))
+        self._start_timer()
 
     def _start_timer(self):
         self._timer(1, self._tick_second, self.time_left)
