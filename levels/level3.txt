@@ -1,2 +1,0 @@
-time=30
-hex x, y=200, 200 size=4 speed=5, 5

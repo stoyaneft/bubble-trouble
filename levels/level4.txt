@@ -1,2 +1,0 @@
-time=40
-ball x, y=100, 250 size=4 speed=3, 0
