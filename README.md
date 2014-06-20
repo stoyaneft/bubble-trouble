@@ -18,5 +18,4 @@ The following aspects of the game will be implemented (things labeled with M2 ar
 - different types of "bubbles" - balls, hexagons...
 - [M2] timer for completion of levels
 - [M2] main menu and submenus
-- scoreboard
 - tests
