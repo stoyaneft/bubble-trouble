@@ -1,5 +1,4 @@
 import json
-import re
 from threading import Timer
 import time
 import sys
@@ -20,7 +19,8 @@ class Game:
         self.level_completed = False
         self.is_running = True
         self.is_completed = False
-        self.max_level = 5
+        self.max_level = MAX_LEVEL
+        self.is_multiplayer = False
         with open('max_level_available', 'r') as max_completed_level_file:
             max_level_available = max_completed_level_file.read()
             if max_level_available:
@@ -35,10 +35,10 @@ class Game:
         self.level_completed = False
         self.level = level
         self.player.is_alive = True
-        with open('max_level_available', 'w') as max_completed_level_file:
-            if self.level > self.max_level_available:
-                max_completed_level_file.write(str(self.level))
-                self.max_level_available = self.level
+        if self.level > self.max_level_available:
+            self.max_level_available = self.level
+            with open('max_level_available', 'w') as max_completed_level_file:
+                max_completed_level_file.write(str(self.max_level_available))
         with open('levels.json', 'r') as levels_file:
             levels = json.load(levels_file)
             level = levels[str(self.level)]
@@ -66,7 +66,7 @@ class Game:
                 self.player.weapon.is_active = False
                 self._split_ball(ball_index)
                 return
-            if pygame.sprite.collide_rect(ball, self.player):
+            if pygame.sprite.collide_mask(ball, self.player):
                 self.player.is_alive = False
                 self._decrease_lives()
                 return
@@ -77,7 +77,20 @@ class Game:
                 self.player.weapon.is_active = False
                 self._split_hexagon(hex_index)
                 return
-            if pygame.sprite.collide_rect(hexagon, self.player):
+            if pygame.sprite.collide_mask(hexagon, self.player):
+                self.player.is_alive = False
+                self._decrease_lives()
+                return
+
+    def _check_player_collision(self):
+        for ball_index in range(len(self.balls)):
+            ball = self.balls[ball_index]
+            if pygame.sprite.collide_mask(ball, self.player.weapon) \
+                    and self.player.weapon.is_active:
+                self.player.weapon.is_active = False
+                self._split_ball(ball_index)
+                return
+            if pygame.sprite.collide_mask(ball, self.player):
                 self.player.is_alive = False
                 self._decrease_lives()
                 return
@@ -97,11 +110,11 @@ class Game:
         ball = self.balls[ball_index]
         if ball.size > 1:
             self.balls.append(Ball(
-                ball.rect.left - ball.size ** 2,
+                ball.rect.left - ball.size**2,
                 ball.rect.top - 10, ball.size - 1, [-3, -5])
             )
             self.balls.append(
-                Ball(ball.rect.left + ball.size ** 2,
+                Ball(ball.rect.left + ball.size**2,
                      ball.rect.top - 10, ball.size - 1, [3, -5])
             )
         del self.balls[ball_index]
@@ -119,7 +132,6 @@ class Game:
 
     def update(self):
         if self.level_completed and not self.is_completed:
-            #self.max_level_available += 1
             self.pause(3)
             self.load_level(self.level + 1)
         if self.game_over:

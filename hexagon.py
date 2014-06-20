@@ -6,7 +6,8 @@ from settings import *
 class Hexagon(pygame.sprite.Sprite):
     def __init__(self, x, y, size, speed):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('images/hexagon' + str(size) + '.png')
+        self.image = pygame.image.load('images/hexagon.png')
+        self.image = pygame.transform.scale(self.image, (size*15, size*15))
         self.rect = self.image.get_rect(centerx=x, centery=y)
         self.size = size
         self.speed = speed
@@ -23,5 +24,5 @@ class Hexagon(pygame.sprite.Sprite):
         self.rect.top = self.clip(self.rect.top, 0, WINDOWHEIGHT)
         self.rect.bottom = self.clip(self.rect.bottom, 0, WINDOWHEIGHT)
 
-    def clip(self, val, minval, maxval):
-        return min(max(val, minval), maxval)
+    def clip(self, val, min_value, max_value):
+        return min(max(val, min_value), max_value)
