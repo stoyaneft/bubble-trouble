@@ -4,10 +4,11 @@ from settings import *
 
 
 class Bubble(pygame.sprite.Sprite):
-    def __init__(self, size, speed):
+    def __init__(self, x, y, size, speed, image_path):
         pygame.sprite.Sprite.__init__(self)
-        self.image = None
-        self.rect = None
+        self.image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(self.image, (size*15, size*15))
+        self.rect = self.image.get_rect(centerx=x, centery=y)
         self.size = size
         self.speed = speed
 
@@ -28,10 +29,7 @@ class Bubble(pygame.sprite.Sprite):
 
 class Ball(Bubble):
     def __init__(self, x, y, size, speed):
-        Bubble.__init__(self, size, speed)
-        self.image = pygame.image.load('images/ball.png')
-        self.image = pygame.transform.scale(self.image, (size*15, size*15))
-        self.rect = self.image.get_rect(centerx=x, centery=y)
+        Bubble.__init__(self, x, y, size, speed, 'images/ball.png')
 
     def update(self):
         self.speed[1] += GRAVITY
@@ -40,10 +38,7 @@ class Ball(Bubble):
 
 class Hexagon(Bubble):
     def __init__(self, x, y, size, speed):
-        Bubble.__init__(self, size, speed)
-        self.image = pygame.image.load('images/hexagon.png')
-        self.image = pygame.transform.scale(self.image, (size*15, size*15))
-        self.rect = self.image.get_rect(centerx=x, centery=y)
+        Bubble.__init__(self, x, y, size, speed, 'images/hexagon.png')
 
 
 

@@ -130,23 +130,25 @@ def handle_game_event():
                 game.players[0].moving_right = True
             elif event.key == K_SPACE and not game.players[0].weapon.is_active:
                 game.players[0].shoot()
-            elif event.key == K_a:
-                game.players[1].moving_left = True
-            elif event.key == K_d:
-                game.players[1].moving_right = True
-            elif event.key == K_LCTRL and not game.players[1].weapon.is_active:
-                game.players[1].shoot()
-            elif event.key == K_ESCAPE:
-                quit_game()
+            if game.is_multiplayer:
+                if event.key == K_a:
+                    game.players[1].moving_left = True
+                elif event.key == K_d:
+                    game.players[1].moving_right = True
+                elif event.key == K_LCTRL and not game.players[1].weapon.is_active:
+                    game.players[1].shoot()
+                elif event.key == K_ESCAPE:
+                    quit_game()
         if event.type == KEYUP:
             if event.key == K_LEFT:
                 game.players[0].moving_left = False
             elif event.key == K_RIGHT:
                 game.players[0].moving_right = False
-            elif event.key == K_a:
-                game.players[1].moving_left = False
-            elif event.key == K_d:
-                game.players[1].moving_right = False
+            if game.is_multiplayer:
+                if event.key == K_a:
+                    game.players[1].moving_left = False
+                elif event.key == K_d:
+                    game.players[1].moving_right = False
         if event.type == QUIT:
             quit_game()
 

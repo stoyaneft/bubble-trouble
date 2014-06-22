@@ -3,8 +3,8 @@ from weapon import *
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self):
-        self.image = pygame.image.load('images/player.png')
+    def __init__(self, image_path='images/player.png'):
+        self.image = pygame.image.load(image_path)
         self.rect = self.image.get_rect()
         self.weapon = Weapon()
         self.moving_left = False

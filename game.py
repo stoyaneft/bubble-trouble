@@ -29,7 +29,7 @@ class Game:
 
     def load_level(self, level):
         if self.is_multiplayer and len(self.players) == 1:
-            self.players.append(Player())
+            self.players.append(Player('images/player2.png'))
         self.balls = []
         self.hexagons = []
         for index, player in enumerate(self.players):
@@ -63,12 +63,11 @@ class Game:
         self._timer(1, self._tick_second, self.time_left)
 
     def _check_for_collisions(self):
-        for player_index, player in enumerate(self.players):
-            self._check_for_bubble_collision(self.balls, True, player_index)
-            self._check_for_bubble_collision(self.hexagons, False, player_index)
+        for player in self.players:
+            self._check_for_bubble_collision(self.balls, True, player)
+            self._check_for_bubble_collision(self.hexagons, False, player)
 
-    def _check_for_bubble_collision(self, bubbles, is_ball, player_index):
-        player = self.players[player_index]
+    def _check_for_bubble_collision(self, bubbles, is_ball, player):
         for bubble_index, bubble in enumerate(bubbles):
             if pygame.sprite.collide_rect(bubble, player.weapon) \
                     and player.weapon.is_active:
@@ -80,17 +79,14 @@ class Game:
                 return
             if pygame.sprite.collide_mask(bubble, player):
                 player.is_alive = False
-                self._decrease_lives(player_index)
+                self._decrease_lives(player)
                 return
 
-    def _decrease_lives(self, player_index):
-        player = self.players[player_index]
+    def _decrease_lives(self, player):
         player.lives -= 1
         if player.lives:
             self.restart()
         else:
-            del self.players[player_index]
-        if not len(self.players):
             self.game_over = True
 
     def restart(self):
@@ -137,13 +133,13 @@ class Game:
             hexagon.update()
         for player in self.players:
             player.update()
-        if not len(self.balls) and not len(self.hexagons):
+        if not self.balls and not self.hexagons:
             self.level_completed = True
             if self.level == self.max_level:
                 self.is_completed = True
 
     def _timer(self, interval, worker_func, iterations=0):
-        if iterations and self.players and not self.level_completed:
+        if iterations and self.players[0].is_alive and self.players[1].is_alive and not self.level_completed:
             Timer(
                 interval, self._timer,
                 [interval, worker_func, 0 if iterations ==
@@ -154,8 +150,8 @@ class Game:
     def _tick_second(self):
         self.time_left -= 1
         if self.time_left == 0:
-            for player_index in range(len(self.players)):
-                self._decrease_lives(player_index)
+            for player in self.players:
+                self._decrease_lives(player)
 
     @staticmethod
     def pause(seconds):
