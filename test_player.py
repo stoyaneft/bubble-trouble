@@ -7,10 +7,10 @@ class PlayerTest(unittest.TestCase):
         self.player = Player()
 
     def test_player_has_image(self):
-        self.assertNotEqual(self.player.image, None, 'Player does not have an image')
+        self.assertIsNotNone(self.player.image, 'Player does not have an image')
 
     def test_player_weapon_has_image(self):
-        self.assertNotEqual(self.player.weapon.image, None, 'Player\'s weapon does not have an image')
+        self.assertIsNotNone(self.player.weapon.image, 'Player\'s weapon does not have an image')
 
     def test_player_movement(self):
         startPlayerX = self.player.rect.centerx
@@ -29,12 +29,12 @@ class PlayerTest(unittest.TestCase):
 
     def test_player_reset_position(self):
         self.player.rect.move(10, 0)
-        self.player.reset_position()
+        self.player.set_position()
         self.assertEqual((self.player.rect.centerx, self.player.rect.bottom), (WINDOWWIDTH / 2, WINDOWHEIGHT))
 
     def test_player_shoots(self):
         self.player.shoot()
-        self.assertNotEqual(self.player.weapon, None)
+        self.assertIsNotNone(self.player.weapon)
         weaponRect = self.player.weapon.rect
         playerRect = self.player.rect
         self.assertEqual((weaponRect.centerx, weaponRect.top), (playerRect.centerx, playerRect.top))

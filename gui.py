@@ -34,11 +34,22 @@ def start_main_menu():
 
 
 def start_load_level_menu():
+    load_level_menu.is_active = True
     while load_level_menu.is_active:
         load_level_menu.draw()
         handle_menu_event(load_level_menu)
         pygame.display.update()
         clock.tick(FPS)
+
+
+def start_single_player_level_menu():
+    game.is_multiplayer = False
+    start_load_level_menu()
+
+
+def start_multiplayer_level_menu():
+    game.is_multiplayer = True
+    start_load_level_menu()
 
 
 def quit_game():
@@ -50,7 +61,7 @@ def back():
     load_level_menu.is_active = False
 
 main_menu = Menu(screen, OrderedDict(
-    [('New game', (start_level, 1)), ('Load level', start_load_level_menu),
+    [('Single Player', start_single_player_level_menu), ('Two Players', start_multiplayer_level_menu),
      ('Quit', quit_game)])
 )
 levels_available = [(str(lvl), (start_level, lvl))
@@ -96,9 +107,10 @@ def draw_world():
         draw_hex(hexagon)
     for ball in game.balls:
         draw_ball(ball)
-    if game.player.weapon.is_active:
-        draw_weapon(game.player.weapon)
-    draw_player(game.player)
+    for player in game.players:
+        if player.weapon.is_active:
+            draw_weapon(player.weapon)
+        draw_player(player)
     draw_timer()
     if game.game_over:
         draw_message('Game over!', RED)
@@ -113,18 +125,28 @@ def handle_game_event():
     for event in pygame.event.get():
         if event.type == KEYDOWN:
             if event.key == K_LEFT:
-                game.player.moving_left = True
+                game.players[0].moving_left = True
             elif event.key == K_RIGHT:
-                game.player.moving_right = True
-            elif event.key == K_SPACE and not game.player.weapon.is_active:
-                game.player.shoot()
+                game.players[0].moving_right = True
+            elif event.key == K_SPACE and not game.players[0].weapon.is_active:
+                game.players[0].shoot()
+            elif event.key == K_a:
+                game.players[1].moving_left = True
+            elif event.key == K_d:
+                game.players[1].moving_right = True
+            elif event.key == K_LCTRL and not game.players[1].weapon.is_active:
+                game.players[1].shoot()
             elif event.key == K_ESCAPE:
                 quit_game()
         if event.type == KEYUP:
             if event.key == K_LEFT:
-                game.player.moving_left = False
+                game.players[0].moving_left = False
             elif event.key == K_RIGHT:
-                game.player.moving_right = False
+                game.players[0].moving_right = False
+            elif event.key == K_a:
+                game.players[1].moving_left = False
+            elif event.key == K_d:
+                game.players[1].moving_right = False
         if event.type == QUIT:
             quit_game()
 

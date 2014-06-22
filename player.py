@@ -10,7 +10,7 @@ class Player(pygame.sprite.Sprite):
         self.moving_left = False
         self.moving_right = False
         self.lives = STARTING_LIVES
-        self.reset_position()
+        self.set_position()
         self.is_alive = True
 
     def shoot(self):
@@ -25,5 +25,5 @@ class Player(pygame.sprite.Sprite):
         if self.weapon.is_active:
             self.weapon.update()
 
-    def reset_position(self):
-        self.rect.bottom, self.rect.centerx = WINDOWHEIGHT, WINDOWWIDTH / 2
+    def set_position(self, x=WINDOWWIDTH/2, y=WINDOWHEIGHT):
+        self.rect.centerx, self.rect.bottom = x, y
