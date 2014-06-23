@@ -20,6 +20,8 @@ class Game:
         self.is_completed = False
         self.max_level = MAX_LEVEL
         self.is_multiplayer = False
+        self.is_restarted = False
+        self.dead_player = False
         with open('max_level_available', 'r') as max_completed_level_file:
             max_level_available = max_completed_level_file.read()
             if max_level_available:
@@ -28,10 +30,12 @@ class Game:
                 self.max_level_available = 1
 
     def load_level(self, level):
+        self.is_restarted = True
         if self.is_multiplayer and len(self.players) == 1:
             self.players.append(Player('images/player2.png'))
         self.balls = []
         self.hexagons = []
+        self.dead_player = False
         for index, player in enumerate(self.players):
             player_number = index + 1
             num_of_players = len(self.players)
@@ -83,14 +87,14 @@ class Game:
                 return
 
     def _decrease_lives(self, player):
+
         player.lives -= 1
         if player.lives:
-            self.restart()
+            self.dead_player = True
         else:
             self.game_over = True
 
     def restart(self):
-        self.pause(1)
         self.load_level(self.level)
 
     def _split_ball(self, ball_index):
@@ -119,13 +123,13 @@ class Game:
 
     def update(self):
         if self.level_completed and not self.is_completed:
-            self.pause(3)
             self.load_level(self.level + 1)
         if self.game_over:
-            self.pause(3)
             self.is_running = False
             pygame.quit()
             sys.exit()
+        if self.dead_player:
+            self.restart()
         self._check_for_collisions()
         for ball in self.balls:
             ball.update()
@@ -139,8 +143,9 @@ class Game:
                 self.is_completed = True
 
     def _timer(self, interval, worker_func, iterations=0):
-        if iterations and self.players[0].is_alive and self.players[1].is_alive and not self.level_completed:
+        if iterations and not self.dead_player and not self.level_completed:
             Timer(
+
                 interval, self._timer,
                 [interval, worker_func, 0 if iterations ==
                     0 else iterations - 1]
@@ -152,7 +157,3 @@ class Game:
         if self.time_left == 0:
             for player in self.players:
                 self._decrease_lives(player)
-
-    @staticmethod
-    def pause(seconds):
-        time.sleep(seconds)

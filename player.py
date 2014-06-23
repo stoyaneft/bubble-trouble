@@ -11,7 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.moving_right = False
         self.lives = STARTING_LIVES
         self.set_position()
-        self.is_alive = True
+        self.is_alive = False
 
     def shoot(self):
         self.weapon = Weapon(self.rect.centerx, self.rect.top)

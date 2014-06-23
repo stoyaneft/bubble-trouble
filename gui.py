@@ -18,10 +18,17 @@ def start_level(level):
     main_menu.is_active = False
     pygame.mouse.set_visible(False)
     while game.is_running:
+        game.update()
         draw_world()
         handle_game_event()
         pygame.display.update()
-        game.update()
+        if game.is_completed or game.game_over or \
+                game.level_completed or game.is_restarted:
+            pygame.time.delay(3000)
+        if game.dead_player:
+            pygame.time.delay(1000)
+        if game.is_restarted:
+            game.is_restarted = False
         clock.tick(FPS)
 
 
@@ -114,12 +121,14 @@ def draw_world():
     draw_timer()
     if game.game_over:
         draw_message('Game over!', RED)
+        start_main_menu()
     if game.is_completed:
         draw_message('Congratulations! You win!!!', PURPLE)
         start_main_menu()
     if game.level_completed and not game.is_completed:
         draw_message('Well done! Level completed!', BLUE)
-
+    if game.is_restarted:
+        draw_message('Get ready!', BLUE)
 
 def handle_game_event():
     for event in pygame.event.get():
@@ -130,6 +139,8 @@ def handle_game_event():
                 game.players[0].moving_right = True
             elif event.key == K_SPACE and not game.players[0].weapon.is_active:
                 game.players[0].shoot()
+            elif event.key == K_ESCAPE:
+                quit_game()
             if game.is_multiplayer:
                 if event.key == K_a:
                     game.players[1].moving_left = True
@@ -137,8 +148,6 @@ def handle_game_event():
                     game.players[1].moving_right = True
                 elif event.key == K_LCTRL and not game.players[1].weapon.is_active:
                     game.players[1].shoot()
-                elif event.key == K_ESCAPE:
-                    quit_game()
         if event.type == KEYUP:
             if event.key == K_LEFT:
                 game.players[0].moving_left = False
@@ -178,7 +187,7 @@ def handle_menu_event(menu):
             elif event.key == pygame.K_DOWN \
                     and menu.current_option == len(menu.options) - 1:
                 menu.current_option = 0
-            elif event.key == pygame.K_RETURN:
+            elif event.key == pygame.K_RETURN and menu.current_option is not None:
                 option = menu.options[menu.current_option]
                 if not isinstance(option.function, tuple):
                     option.function()
