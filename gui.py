@@ -130,6 +130,7 @@ def draw_world():
     if game.is_restarted:
         draw_message('Get ready!', BLUE)
 
+
 def handle_game_event():
     for event in pygame.event.get():
         if event.type == KEYDOWN:

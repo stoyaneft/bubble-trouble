@@ -1,6 +1,5 @@
 import json
 from threading import Timer
-import time
 import sys
 
 from bubbles import *
@@ -13,6 +12,7 @@ class Game:
         self.balls = []
         self.hexagons = []
         self.players = [Player()]
+        self.bonuses = []
         self.level = level
         self.game_over = False
         self.level_completed = False
@@ -22,6 +22,7 @@ class Game:
         self.is_multiplayer = False
         self.is_restarted = False
         self.dead_player = False
+        self.mode = 'Classic'
         with open('max_level_available', 'r') as max_completed_level_file:
             max_level_available = max_completed_level_file.read()
             if max_level_available:
@@ -80,22 +81,26 @@ class Game:
                     self._split_ball(bubble_index)
                 else:
                     self._split_hexagon(bubble_index)
-                return
+                return True
             if pygame.sprite.collide_mask(bubble, player):
                 player.is_alive = False
                 self._decrease_lives(player)
-                return
+                return True
+        return False
 
     def _decrease_lives(self, player):
-
         player.lives -= 1
         if player.lives:
             self.dead_player = True
+            player.is_alive = False
         else:
             self.game_over = True
 
-    def restart(self):
+    def _restart(self):
         self.load_level(self.level)
+
+    #def _drop_bonus(self):
+
 
     def _split_ball(self, ball_index):
         ball = self.balls[ball_index]
@@ -129,7 +134,7 @@ class Game:
             pygame.quit()
             sys.exit()
         if self.dead_player:
-            self.restart()
+            self._restart()
         self._check_for_collisions()
         for ball in self.balls:
             ball.update()
@@ -143,7 +148,7 @@ class Game:
                 self.is_completed = True
 
     def _timer(self, interval, worker_func, iterations=0):
-        if iterations and not self.dead_player and not self.level_completed:
+        if iterations and not self.dead_player and not self.level_completed and not self.is_restarted:
             Timer(
 
                 interval, self._timer,

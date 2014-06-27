@@ -31,6 +31,9 @@ class Ball(Bubble):
     def __init__(self, x, y, size, speed):
         Bubble.__init__(self, x, y, size, speed, 'images/ball.png')
 
+    def __str__(self):
+        return 'ball'
+
     def update(self):
         self.speed[1] += GRAVITY
         Bubble.update(self)
@@ -39,6 +42,9 @@ class Ball(Bubble):
 class Hexagon(Bubble):
     def __init__(self, x, y, size, speed):
         Bubble.__init__(self, x, y, size, speed, 'images/hexagon.png')
+
+    def __str__(self):
+        return 'hexagon'
 
 
 
