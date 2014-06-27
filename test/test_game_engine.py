@@ -1,5 +1,5 @@
 import unittest
-import time
+import settings
 
 from game import *
 
@@ -98,8 +98,14 @@ class GameEngineTest(unittest.TestCase):
         self.game._tick_second()
         self.assertEqual(self.game.time_left, start_time - 1)
 
+    # def test_timer(self):
+    #     self.game.load_level(1)
+    #     start_time = self.game.time_left
+    #     end_time = self.game.time_left
+    #     self.assertEqual(start_time, end_time + 3)
+
     def test_max_level_available_read(self):
-        with open('max_level_available', 'r') as max_completed_level_file:
+        with open(APP_PATH + 'max_level_available', 'r') as max_completed_level_file:
             max_level_available = int(max_completed_level_file.read())
             self.assertEqual(max_level_available, self.game.max_level_available)
 

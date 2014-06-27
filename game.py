@@ -1,9 +1,11 @@
-import json
-from threading import Timer
 import sys
+from threading import Timer
+import random
+import json
 
 from bubbles import *
 from player import *
+from bonuses import *
 
 
 class Game:
@@ -23,7 +25,7 @@ class Game:
         self.is_restarted = False
         self.dead_player = False
         self.mode = 'Classic'
-        with open('max_level_available', 'r') as max_completed_level_file:
+        with open(APP_PATH + 'max_level_available', 'r') as max_completed_level_file:
             max_level_available = max_completed_level_file.read()
             if max_level_available:
                 self.max_level_available = int(max_level_available)
@@ -33,7 +35,7 @@ class Game:
     def load_level(self, level):
         self.is_restarted = True
         if self.is_multiplayer and len(self.players) == 1:
-            self.players.append(Player('images/player2.png'))
+            self.players.append(Player('player2.png'))
         self.balls = []
         self.hexagons = []
         self.dead_player = False
@@ -46,9 +48,9 @@ class Game:
         self.level = level
         if self.level > self.max_level_available:
             self.max_level_available = self.level
-            with open('max_level_available', 'w') as max_completed_level_file:
+            with open(APP_PATH + 'max_level_available', 'w') as max_completed_level_file:
                 max_completed_level_file.write(str(self.max_level_available))
-        with open('levels.json', 'r') as levels_file:
+        with open(APP_PATH + 'levels.json', 'r') as levels_file:
             levels = json.load(levels_file)
             level = levels[str(self.level)]
             self.time_left = level['time']
@@ -71,6 +73,7 @@ class Game:
         for player in self.players:
             self._check_for_bubble_collision(self.balls, True, player)
             self._check_for_bubble_collision(self.hexagons, False, player)
+            self._check_for_bonus_collision(player)
 
     def _check_for_bubble_collision(self, bubbles, is_ball, player):
         for bubble_index, bubble in enumerate(bubbles):
@@ -88,6 +91,14 @@ class Game:
                 return True
         return False
 
+    def _check_for_bonus_collision(self, player):
+        for bonus_index, bonus in enumerate(self.bonuses):
+            if pygame.sprite.collide_mask(bonus, player):
+                self._activate_bonus(bonus)
+                del self.bonuses[bonus_index]
+                return True
+        return False
+
     def _decrease_lives(self, player):
         player.lives -= 1
         if player.lives:
@@ -99,8 +110,17 @@ class Game:
     def _restart(self):
         self.load_level(self.level)
 
-    #def _drop_bonus(self):
+    @staticmethod
+    def _drop_bonus():
+        if random.randrange(10) == 0:
+            bonus_type = random.choice(bonus_types)
+            return bonus_type
 
+    def _activate_bonus(self, bonus, player):
+        if bonus == BONUS_LIFE:
+            player.lives += 1
+        elif bonus == BONUS_TIME:
+            self.time_left += 10
 
     def _split_ball(self, ball_index):
         ball = self.balls[ball_index]
@@ -114,6 +134,10 @@ class Game:
                      ball.rect.top - 10, ball.size - 1, [3, -5])
             )
         del self.balls[ball_index]
+        bonus_type = self._drop_bonus()
+        if bonus_type:
+            bonus = Bonus(ball.rect.centerx, ball.rect.bottom, bonus_type)
+            self.bonuses.append(bonus)
 
     def _split_hexagon(self, hex_index):
         hexagon = self.hexagons[hex_index]
@@ -142,6 +166,8 @@ class Game:
             hexagon.update()
         for player in self.players:
             player.update()
+        for bonus in self.bonuses:
+            bonus.update()
         if not self.balls and not self.hexagons:
             self.level_completed = True
             if self.level == self.max_level:

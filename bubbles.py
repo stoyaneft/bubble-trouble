@@ -4,9 +4,9 @@ from settings import *
 
 
 class Bubble(pygame.sprite.Sprite):
-    def __init__(self, x, y, size, speed, image_path):
+    def __init__(self, x, y, size, speed, image_name):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(image_path)
+        self.image = pygame.image.load(IMAGES_PATH + image_name)
         self.image = pygame.transform.scale(self.image, (size*15, size*15))
         self.rect = self.image.get_rect(centerx=x, centery=y)
         self.size = size
@@ -29,7 +29,7 @@ class Bubble(pygame.sprite.Sprite):
 
 class Ball(Bubble):
     def __init__(self, x, y, size, speed):
-        Bubble.__init__(self, x, y, size, speed, 'images/ball.png')
+        Bubble.__init__(self, x, y, size, speed, 'ball.png')
 
     def __str__(self):
         return 'ball'
@@ -41,7 +41,7 @@ class Ball(Bubble):
 
 class Hexagon(Bubble):
     def __init__(self, x, y, size, speed):
-        Bubble.__init__(self, x, y, size, speed, 'images/hexagon.png')
+        Bubble.__init__(self, x, y, size, speed, 'hexagon.png')
 
     def __str__(self):
         return 'hexagon'

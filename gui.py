@@ -93,6 +93,10 @@ def draw_weapon(weapon):
     screen.blit(weapon.image, weapon.rect)
 
 
+def draw_bonus(bonus):
+    screen.blit(bonus.image, bonus.rect)
+
+
 def draw_message(message, colour):
     label = font.render(message, 1, colour)
     rect = label.get_rect()
@@ -118,6 +122,8 @@ def draw_world():
         if player.weapon.is_active:
             draw_weapon(player.weapon)
         draw_player(player)
+    for bonus in game.bonuses:
+        draw_bonus(bonus)
     draw_timer()
     if game.game_over:
         draw_message('Game over!', RED)
