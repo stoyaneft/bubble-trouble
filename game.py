@@ -38,6 +38,7 @@ class Game:
             self.players.append(Player('player2.png'))
         self.balls = []
         self.hexagons = []
+        self.bonuses = []
         self.dead_player = False
         for index, player in enumerate(self.players):
             player_number = index + 1
@@ -94,7 +95,7 @@ class Game:
     def _check_for_bonus_collision(self, player):
         for bonus_index, bonus in enumerate(self.bonuses):
             if pygame.sprite.collide_mask(bonus, player):
-                self._activate_bonus(bonus)
+                self._activate_bonus(bonus.type, player)
                 del self.bonuses[bonus_index]
                 return True
         return False
@@ -112,7 +113,7 @@ class Game:
 
     @staticmethod
     def _drop_bonus():
-        if random.randrange(10) == 0:
+        if random.randrange(BONUS_DROP_RATE) == 0:
             bonus_type = random.choice(bonus_types)
             return bonus_type
 
@@ -136,7 +137,7 @@ class Game:
         del self.balls[ball_index]
         bonus_type = self._drop_bonus()
         if bonus_type:
-            bonus = Bonus(ball.rect.centerx, ball.rect.bottom, bonus_type)
+            bonus = Bonus(ball.rect.centerx, ball.rect.centery, bonus_type)
             self.bonuses.append(bonus)
 
     def _split_hexagon(self, hex_index):
@@ -149,6 +150,10 @@ class Game:
                 Hexagon(hexagon.rect.right, hexagon.rect.centery,
                         hexagon.size - 1, [3, -5]))
         del self.hexagons[hex_index]
+        bonus_type = self._drop_bonus()
+        if bonus_type:
+            bonus = Bonus(hexagon.rect.centerx, hexagon.rect.centery, bonus_type)
+            self.bonuses.append(bonus)
 
     def update(self):
         if self.level_completed and not self.is_completed:
@@ -174,7 +179,7 @@ class Game:
                 self.is_completed = True
 
     def _timer(self, interval, worker_func, iterations=0):
-        if iterations and not self.dead_player and not self.level_completed and not self.is_restarted:
+        if iterations and not self.dead_player and not self.level_completed:
             Timer(
 
                 interval, self._timer,
