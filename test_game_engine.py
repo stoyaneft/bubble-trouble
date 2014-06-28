@@ -21,7 +21,7 @@ class GameEngineTest(unittest.TestCase):
         return bubble_properties
 
     def test_load_level(self):
-        self.game.load_level(2)
+        self.game.load_level(1)
         with open(APP_PATH + 'levels.json', 'r') as levels_file:
             levels = json.load(levels_file)
             level = levels[str(self.game.level)]
@@ -29,6 +29,9 @@ class GameEngineTest(unittest.TestCase):
         for ball_index, ball in enumerate(self.game.balls):
             ball_properties = self.load_bubble(ball)
             self.assertEqual(ball_properties, level['balls'][ball_index])
+        for hex_index, hex in enumerate(self.game.hexagons):
+            hex_properties = self.load_bubble(hex)
+            self.assertEqual(hex_properties, level['balls'][hex_index])
 
     def test_bubble_collision(self):
         ball_rect = self.game.balls[0].rect
@@ -108,11 +111,14 @@ class GameEngineTest(unittest.TestCase):
         self.assertTrue(self.game.game_over)
 
     def test_game_completed(self):
+        max_level_available = self.game.max_level_available
         self.game.load_level(self.game.max_level)
         self.game.balls = []
         self.game.hexagons = []
         self.game.update()
         self.assertTrue(self.game.is_completed)
+        with open('max_level_available', 'w') as max_completed_level_file:
+            max_completed_level_file.write(str(max_level_available))
 
     def test_tick_second(self):
         self.game.load_level(1)
@@ -122,7 +128,11 @@ class GameEngineTest(unittest.TestCase):
 
     def test_max_level_available_file_read(self):
         with open('max_level_available', 'r') as max_completed_level_file:
-            max_level_available = int(max_completed_level_file.read())
+            max_level_available = max_completed_level_file.read()
+            if max_level_available:
+                max_level_available = int(max_level_available)
+            else:
+                max_level_available = 1
             self.assertEqual(max_level_available,
                              self.game.max_level_available)
 

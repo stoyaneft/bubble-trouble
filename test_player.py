@@ -15,25 +15,25 @@ class PlayerTest(unittest.TestCase):
                              'Player\'s weapon does not have an image')
 
     def test_player_movement(self):
-        startPlayerX = self.player.rect.centerx
+        start_player_x = self.player.rect.centerx
         self.player.moving_right = True
         self.player.update()
         self.assertEqual(
-            startPlayerX + PLAYER_SPEED,
+            start_player_x + PLAYER_SPEED,
             self.player.rect.centerx, 'Player moving right is wrong'
         )
         self.player.moving_right = False
         self.player.moving_left = True
-        startPlayerX = self.player.rect.centerx
+        start_player_x = self.player.rect.centerx
         self.player.update()
         self.assertEqual(
-            startPlayerX - PLAYER_SPEED,
+            start_player_x - PLAYER_SPEED,
             self.player.rect.centerx, 'Player moving left is wrong'
         )
         self.player.moving_left = False
-        startPlayerX = self.player.rect.centerx
+        start_player_x = self.player.rect.centerx
         self.player.update()
-        self.assertEqual(startPlayerX, self.player.rect.centerx,
+        self.assertEqual(start_player_x, self.player.rect.centerx,
                          'Player should not have moved')
 
     def test_player_reset_position(self):
@@ -45,10 +45,10 @@ class PlayerTest(unittest.TestCase):
     def test_player_shoots(self):
         self.player.shoot()
         self.assertIsNotNone(self.player.weapon)
-        weaponRect = self.player.weapon.rect
-        playerRect = self.player.rect
-        self.assertEqual((weaponRect.centerx, weaponRect.top),
-                         (playerRect.centerx, playerRect.top))
+        weapon_rect = self.player.weapon.rect
+        player_rect = self.player.rect
+        self.assertEqual((weapon_rect.centerx, weapon_rect.top),
+                         (player_rect.centerx, player_rect.top))
 
     def test_player_weapon_movement(self):
         self.player.shoot()

@@ -116,16 +116,30 @@ def draw_timer():
     screen.blit(timer, rect)
 
 
+def draw_players_lives(player, is_main_player=True):
+    player_image = pygame.transform.scale(player.image, (20, 20))
+    rect = player_image.get_rect()
+    for life_num in range(player.lives):
+        if not is_main_player:
+            screen.blit(player_image, ((life_num + 1) * 20, 10))
+        else:
+            screen.blit(
+                player_image,
+                (WINDOWWIDTH - (life_num + 1) * 20 - rect.width, 10)
+            )
+
+
 def draw_world():
     screen.fill(WHITE)
     for hexagon in game.hexagons:
         draw_hex(hexagon)
     for ball in game.balls:
         draw_ball(ball)
-    for player in game.players:
+    for player_index, player in enumerate(game.players):
         if player.weapon.is_active:
             draw_weapon(player.weapon)
         draw_player(player)
+        draw_players_lives(player, player_index)
     for bonus in game.bonuses:
         draw_bonus(bonus)
     draw_timer()
