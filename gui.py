@@ -29,6 +29,7 @@ def start_level(level):
             pygame.time.delay(1000)
         if game.is_restarted:
             game.is_restarted = False
+            game._start_timer()
         clock.tick(FPS)
 
 
@@ -67,9 +68,12 @@ def quit_game():
 def back():
     load_level_menu.is_active = False
 
-main_menu = Menu(screen, OrderedDict(
-    [('Single Player', start_single_player_level_menu), ('Two Players', start_multiplayer_level_menu),
-     ('Quit', quit_game)])
+main_menu = Menu(
+    screen, OrderedDict(
+        [('Single Player', start_single_player_level_menu),
+            ('Two Players', start_multiplayer_level_menu),
+            ('Quit', quit_game)]
+    )
 )
 levels_available = [(str(lvl), (start_level, lvl))
                     for lvl in range(1, game.max_level_available + 1)]
@@ -153,7 +157,8 @@ def handle_game_event():
                     game.players[1].moving_left = True
                 elif event.key == K_d:
                     game.players[1].moving_right = True
-                elif event.key == K_LCTRL and not game.players[1].weapon.is_active:
+                elif event.key == K_LCTRL and \
+                        not game.players[1].weapon.is_active:
                     game.players[1].shoot()
         if event.type == KEYUP:
             if event.key == K_LEFT:
@@ -194,7 +199,8 @@ def handle_menu_event(menu):
             elif event.key == pygame.K_DOWN \
                     and menu.current_option == len(menu.options) - 1:
                 menu.current_option = 0
-            elif event.key == pygame.K_RETURN and menu.current_option is not None:
+            elif event.key == pygame.K_RETURN and \
+                    menu.current_option is not None:
                 option = menu.options[menu.current_option]
                 if not isinstance(option.function, tuple):
                     option.function()

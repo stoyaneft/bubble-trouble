@@ -1,5 +1,4 @@
 import unittest
-import time
 
 from game import *
 
@@ -12,46 +11,67 @@ class GameEngineTest(unittest.TestCase):
         hex = Hexagon(20, WINDOWHEIGHT - 20, 2, [3, 3])
         self.game.hexagons.append(hex)
 
-    # def test_bubbles_loaded(self, level, bubbles):
-    #     for bubble_index, bubble in enumerate(bubbles):
-    #         ball_properties = {}
-    #         ball_properties['x'] = bubble.rect.centerx
-    #         ball_properties['y'] = bubble.rect.centery
-    #         ball_properties['size'] = bubble.size
-    #         ball_properties['speed'] = bubble.speed
-    #         self.assertEqual(ball_properties, level[str(bubble) + 's'][bubble_index])
-    #
-    # def test_load_level(self):
-    #     self.game.load_level(2)
-    #     with open('levels.json', 'r') as levels_file:
-    #         levels = json.load(levels_file)
-    #         level = levels[str(self.game.level)]
-    #     self.assertEqual(self.game.time_left, level['time'])
-    #     self.test_bubbles_loaded(level, self.game.balls)
-    #     self.test_bubbles_loaded(level, self.game.hexagons)
+    @staticmethod
+    def load_bubble(bubble):
+        bubble_properties = {}
+        bubble_properties['x'] = bubble.rect.centerx
+        bubble_properties['y'] = bubble.rect.centery
+        bubble_properties['size'] = bubble.size
+        bubble_properties['speed'] = bubble.speed
+        return bubble_properties
+
+    def test_load_level(self):
+        self.game.load_level(2)
+        with open(APP_PATH + 'levels.json', 'r') as levels_file:
+            levels = json.load(levels_file)
+            level = levels[str(self.game.level)]
+        self.assertEqual(self.game.time_left, level['time'])
+        for ball_index, ball in enumerate(self.game.balls):
+            ball_properties = self.load_bubble(ball)
+            self.assertEqual(ball_properties, level['balls'][ball_index])
 
     def test_bubble_collision(self):
-        ballRect = self.game.balls[0].rect
-        ball_center_x, ball_center_y = ballRect.centerx, ballRect.centery
-        self.game.players[0].set_position(ball_center_x, WINDOWHEIGHT)
-        self.assertTrue(self.game._check_for_bubble_collision(self.game.balls, True, self.game.players[0]))
-        self.game.players[0].set_position(ball_center_x - ballRect.width, WINDOWHEIGHT)
-        self.assertFalse(self.game._check_for_bubble_collision(self.game.balls, True, self.game.players[0]))
-        self.assertTrue(self.game._check_for_bubble_collision(self.game.hexagons, False, self.game.players[0]))
+        ball_rect = self.game.balls[0].rect
+        ball_center_x, ball_center_y = ball_rect.centerx, ball_rect.centery
+        self.game.players[0].set_position(ball_center_x)
+        self.assertTrue(self.game._check_for_bubble_collision(
+            self.game.balls, True, self.game.players[0])
+        )
+        self.game.players[0].set_position(ball_center_x - ball_rect.width)
+        self.assertFalse(self.game._check_for_bubble_collision(
+            self.game.balls, True, self.game.players[0])
+        )
+        self.assertTrue(self.game._check_for_bubble_collision(
+            self.game.hexagons, False, self.game.players[0])
+        )
         self.game.players[0].weapon = Weapon(ball_center_x, ball_center_y)
         self.game.players[0].weapon.is_active = True
-        self.assertTrue(self.game._check_for_bubble_collision(self.game.balls, True, self.game.players[0]))
-        self.game.players[0].weapon = Weapon(ball_center_x, ball_center_y + ballRect.height)
+        self.assertTrue(self.game._check_for_bubble_collision(
+            self.game.balls, True, self.game.players[0])
+        )
+        self.game.players[0].weapon = Weapon(
+            ball_center_x, ball_center_y + ball_rect.height
+        )
         self.game.players[0].weapon.is_active = True
-        self.assertFalse(self.game._check_for_bubble_collision(self.game.balls, True, self.game.players[0]))
+        self.assertFalse(self.game._check_for_bubble_collision(
+            self.game.balls, True, self.game.players[0])
+        )
 
     def test_split_ball(self):
-        startNumOfBalls = len(self.game.balls)
-        startBallSize = self.game.balls[0].size
+        start_num_balls = len(self.game.balls)
+        start_ball_size = self.game.balls[0].size
         self.game._split_ball(0)
-        self.assertEqual(len(self.game.balls), startNumOfBalls + 1)
-        self.assertEqual(self.game.balls[0].size, startBallSize - 1)
-        self.assertEqual(self.game.balls[1].size, startBallSize - 1)
+        self.assertEqual(len(self.game.balls), start_num_balls + 1)
+        self.assertEqual(self.game.balls[0].size, start_ball_size - 1)
+        self.assertEqual(self.game.balls[1].size, start_ball_size - 1)
+
+    def test_split_hexagon(self):
+        start_num_hexes = len(self.game.balls)
+        start_hex_size = self.game.hexagons[0].size
+        self.game._split_hexagon(0)
+        self.assertEqual(len(self.game.hexagons), start_num_hexes + 1)
+        self.assertEqual(self.game.hexagons[0].size, start_hex_size - 1)
+        self.assertEqual(self.game.hexagons[1].size, start_hex_size - 1)
 
     def test_level_completed(self):
         while self.game.balls:
@@ -75,7 +95,9 @@ class GameEngineTest(unittest.TestCase):
         ballRect = self.game.balls[0].rect
         ball_center_x, ball_center_y = ballRect.centerx, ballRect.centery
         self.game.players[0].set_position(ball_center_x, WINDOWHEIGHT)
-        self.game._check_for_bubble_collision(self.game.balls, True, self.game.players[0])
+        self.game._check_for_bubble_collision(
+            self.game.balls, True, self.game.players[0]
+        )
         self.assertFalse(player.is_alive)
         self.assertTrue(self.game.dead_player)
 
@@ -98,22 +120,43 @@ class GameEngineTest(unittest.TestCase):
         self.game._tick_second()
         self.assertEqual(self.game.time_left, start_time - 1)
 
-    def test_max_level_available_read(self):
+    def test_max_level_available_file_read(self):
         with open('max_level_available', 'r') as max_completed_level_file:
             max_level_available = int(max_completed_level_file.read())
-            self.assertEqual(max_level_available, self.game.max_level_available)
+            self.assertEqual(max_level_available,
+                             self.game.max_level_available)
 
-    # def test_max_level_available_file_updates(self):
-    #     with open('max_level_available', 'r') as max_completed_level_file:
-    #         max_level_available_before = int(max_completed_level_file.read())
-    #     self.game.load_level(max_level_available_before)
-    #     self.game.level_completed = True
-    #     self.game.update()
-    #     with open('max_level_available', 'r') as max_completed_level_file:
-    #         max_level_available_after = int(max_completed_level_file.read())
-    #     self.assertEqual(max_level_available_after, max_level_available_before + 1)
+    def test_activate_bonus_life(self):
+        player = self.game.players[0]
+        start_lives = player.lives
+        self.game._activate_bonus(BONUS_LIFE, player)
+        end_lives = player.lives
+        self.assertEqual(start_lives + 1, end_lives)
 
+    def test_activate_bonus_time(self):
+        self.game.load_level(1)
+        start_time_left = self.game.time_left
+        self.game._activate_bonus(BONUS_TIME, self.game.players[0])
+        end_time_left = self.game.time_left
+        self.assertEqual(start_time_left + 10, end_time_left)
 
+    def test_bonus_collision(self):
+        bonus = Bonus(50, WINDOWHEIGHT, BONUS_LIFE)
+        self.game.bonuses.append(bonus)
+        self.game.players[0].set_position(50)
+        self.assertTrue(
+            self.game._check_for_bonus_collision(self.game.players[0])
+        )
+        self.game.players[0].set_position(50 - bonus.rect.width/2)
+        self.assertFalse(
+            self.game._check_for_bonus_collision(self.game.players[0])
+        )
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_multiplayer(self):
+        self.game.is_multiplayer = True
+        self.game.load_level(1)
+        self.assertEqual(len(self.game.players), 2)
+        self.assertIsNotNone(self.game.players[1].image)
+
+# if __name__ == '__main__':
+#     unittest.main()

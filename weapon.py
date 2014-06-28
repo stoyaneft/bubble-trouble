@@ -5,7 +5,6 @@ from settings import *
 class Weapon(pygame.sprite.Sprite):
 
     def __init__(self, x=0, y=0):
-        # self.type = type
         self.is_active = False
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(IMAGES_PATH + 'arrow.png')

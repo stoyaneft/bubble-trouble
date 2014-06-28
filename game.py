@@ -25,7 +25,8 @@ class Game:
         self.is_restarted = False
         self.dead_player = False
         self.mode = 'Classic'
-        with open(APP_PATH + 'max_level_available', 'r') as max_completed_level_file:
+        with open(APP_PATH + 'max_level_available', 'r') as \
+                max_completed_level_file:
             max_level_available = max_completed_level_file.read()
             if max_level_available:
                 self.max_level_available = int(max_level_available)
@@ -43,13 +44,16 @@ class Game:
         for index, player in enumerate(self.players):
             player_number = index + 1
             num_of_players = len(self.players)
-            player.set_position((WINDOWWIDTH / (num_of_players + 1)) * player_number, WINDOWHEIGHT)
+            player.set_position(
+                (WINDOWWIDTH / (num_of_players + 1)) * player_number
+            )
             player.is_alive = True
         self.level_completed = False
         self.level = level
         if self.level > self.max_level_available:
             self.max_level_available = self.level
-            with open(APP_PATH + 'max_level_available', 'w') as max_completed_level_file:
+            with open(APP_PATH + 'max_level_available', 'w') as \
+                    max_completed_level_file:
                 max_completed_level_file.write(str(self.max_level_available))
         with open(APP_PATH + 'levels.json', 'r') as levels_file:
             levels = json.load(levels_file)
@@ -152,7 +156,8 @@ class Game:
         del self.hexagons[hex_index]
         bonus_type = self._drop_bonus()
         if bonus_type:
-            bonus = Bonus(hexagon.rect.centerx, hexagon.rect.centery, bonus_type)
+            bonus = Bonus(hexagon.rect.centerx, hexagon.rect.centery,
+                          bonus_type)
             self.bonuses.append(bonus)
 
     def update(self):
@@ -179,7 +184,8 @@ class Game:
                 self.is_completed = True
 
     def _timer(self, interval, worker_func, iterations=0):
-        if iterations and not self.dead_player and not self.level_completed:
+        if iterations and not self.dead_player and not \
+                self.level_completed and not self.is_restarted:
             Timer(
 
                 interval, self._timer,

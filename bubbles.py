@@ -18,21 +18,19 @@ class Bubble(pygame.sprite.Sprite):
             self.speed[0] = -self.speed[0]
         if self.rect.top < 0 or self.rect.bottom > WINDOWHEIGHT:
             self.speed[1] = -self.speed[1]
-        self.rect.left = self.clip(self.rect.left, 0, WINDOWWIDTH)
-        self.rect.right = self.clip(self.rect.right, 0, WINDOWWIDTH)
-        self.rect.top = self.clip(self.rect.top, 0, WINDOWHEIGHT)
-        self.rect.bottom = self.clip(self.rect.bottom, 0, WINDOWHEIGHT)
+        self.rect.left = self._clip(self.rect.left, 0, WINDOWWIDTH)
+        self.rect.right = self._clip(self.rect.right, 0, WINDOWWIDTH)
+        self.rect.top = self._clip(self.rect.top, 0, WINDOWHEIGHT)
+        self.rect.bottom = self._clip(self.rect.bottom, 0, WINDOWHEIGHT)
 
-    def clip(self, val, min_value, max_value):
+    @staticmethod
+    def _clip(val, min_value, max_value):
         return min(max(val, min_value), max_value)
 
 
 class Ball(Bubble):
     def __init__(self, x, y, size, speed):
         Bubble.__init__(self, x, y, size, speed, 'ball.png')
-
-    def __str__(self):
-        return 'ball'
 
     def update(self):
         self.speed[1] += GRAVITY
@@ -42,10 +40,3 @@ class Ball(Bubble):
 class Hexagon(Bubble):
     def __init__(self, x, y, size, speed):
         Bubble.__init__(self, x, y, size, speed, 'hexagon.png')
-
-    def __str__(self):
-        return 'hexagon'
-
-
-
-
