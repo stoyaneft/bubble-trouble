@@ -168,8 +168,5 @@ class GameEngineTest(unittest.TestCase):
         self.assertEqual(len(self.game.players), 2)
         self.assertIsNotNone(self.game.players[1].image)
 
-    def test_pass(self):
-        self.assertTrue(True)
-
 # if __name__ == '__main__':
 #     unittest.main()
